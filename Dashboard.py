@@ -34,6 +34,11 @@ class Dashboard(QDialog):
         layout.addWidget(QPushButton('Rolluik 1'), 0, 0)
         layout.addWidget(QPushButton('Rolluik 2'), 0, 1)
 
+        layout.setContentsMargins(5,5,5,5)
+        layout.setSpacing(10)
+
+        layout.setAlignment(layout, Qt.AlignTop)
+
         Grid.setLayout(layout)
         return Grid
 
@@ -43,6 +48,10 @@ class Dashboard(QDialog):
 
         layout.addWidget(QPushButton("Manual mode"))
         layout.addWidget(QPushButton("Statistics"))
+
+        layout.setSpacing(10)
+        layout.setContentsMargins(5,5,5,5)
+        layout.setAlignment(layout, Qt.AlignTop)
 
         menuBar.setLayout(layout)
         return menuBar
