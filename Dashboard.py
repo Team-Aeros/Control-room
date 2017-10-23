@@ -1,8 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QGroupBox, QDialog, QVBoxLayout, \
-    QGridLayout
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import * #QApplication, QWidget, QPushButton, QHBoxLayout, QGroupBox, QDialog, QVBoxLayout, QGridLayout, QW
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class Dashboard(QDialog):
@@ -19,22 +18,35 @@ class Dashboard(QDialog):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.createGridLayout()
+        windowLayout = QGridLayout()
 
-        windowLayout = QVBoxLayout()
-        windowLayout.addWidget(self.horizontalGroupBox)
+        windowLayout.addWidget(self.createGridLayout(), 0, 1)
+        windowLayout.addWidget(self.createMenu(),0,0)
+
         self.setLayout(windowLayout)
 
         self.show()
 
     def createGridLayout(self):
-        self.horizontalGroupBox = QGroupBox("Devices")
+        Grid = QGroupBox("Devices")
         layout = QGridLayout()
 
         layout.addWidget(QPushButton('Rolluik 1'), 0, 0)
         layout.addWidget(QPushButton('Rolluik 2'), 0, 1)
 
-        self.horizontalGroupBox.setLayout(layout)
+        Grid.setLayout(layout)
+        return Grid
+
+    def createMenu(self):
+        menuBar = QWidget()
+        layout = QVBoxLayout()
+
+        layout.addWidget(QPushButton("Manual mode"))
+        layout.addWidget(QPushButton("Statistics"))
+
+        menuBar.setLayout(layout)
+        return menuBar
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
