@@ -8,6 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -166,6 +167,13 @@ class Ui_MainWindow(object):
 
     def toggleManual(self):
         print("Popup that allows to roll out shutter")
+        try:
+            popup = QInputDialog()
+            print("test")
+        except:
+            pass
+
+
 
     def showGraphs(self):
         print("Shows 2 graphs, temp and light")
@@ -174,8 +182,13 @@ class Ui_MainWindow(object):
         print("Allows the changing of min and max roll uit values")
 
     def showInfo(self):
-        print("Aeros dev is cool as fuck")
-
+        info = QMessageBox()
+        info.setIcon(QMessageBox.Information)
+        info.setText("Aeros dev is cool.")
+        info.setInformativeText("Like really, really cool")
+        info.setWindowTitle("Info")
+        info.setStandardButtons(QMessageBox.Cancel)
+        info.exec_()
 
 if __name__ == "__main__":
     import sys
