@@ -9,8 +9,9 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
 from stringNames import *
+from settings import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -217,6 +218,15 @@ class Ui_MainWindow(object):
 
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
+        try:
+            sw = QtWidgets.QWidget()
+            ui = settingsWindow()
+            ui.setupSettingsWindowUi(sw)
+            sw.show()
+
+        except:
+            print("failed")
+            pass
 
     def showInfo(self):
         info = QMessageBox()
