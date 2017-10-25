@@ -199,12 +199,18 @@ class Ui_MainWindow(object):
     def toggleManual(self):
         print("Popup that allows to roll out shutter")
         try:
-            popup = QInputDialog()
-            print("test")
+            s = stringNames()
+            s.setManualText("Give percentage", "percentage: ")
+            string = s.getManualText()
+            title_text = string.split(";", )
+            title = title_text[0]
+            text = title_text[1]
+
+            res, popup = QInputDialog(MainWindow).getInt(MainWindow, title, text ,0 , 0, 100, 1) #res is input result
+            popup.exec()
+
         except:
             pass
-
-
 
     def showGraphs(self):
         print("Shows 2 graphs, temp and light")
@@ -214,11 +220,14 @@ class Ui_MainWindow(object):
 
     def showInfo(self):
         info = QMessageBox()
+
         s = stringNames()
+        s.setInfoText("Aeros Development", "we made this dashboard")
         string = s.getInfoText()
         title_text = string.split(";",)
         title = title_text[0]
         text = title_text[1]
+
         info.setIcon(QMessageBox.Information)
         info.setText(title)
         info.setInformativeText(text)

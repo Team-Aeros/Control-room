@@ -3,8 +3,8 @@ class stringNames():
     info_title = ""
     info_text = ""
 
-    def __init__(self):
-        self.setInfoText("Aeros dev is cool.", "Like really, really cool")
+    manual_title = ""
+    manual_text = ""
 
     def setInfoText(self,title, text):
         self.info_title = title
@@ -12,3 +12,10 @@ class stringNames():
 
     def getInfoText(self):
         return self.info_title + ";" + self.info_text
+
+    def setManualText(self, title, text):
+        self.manual_title = title
+        self.manual_text = text
+
+    def getManualText(self):
+        return self.manual_title + ";" + self.manual_text
