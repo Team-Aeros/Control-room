@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QMessageBox
+from stringNames import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -129,6 +130,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Rolluik1Widget.sizePolicy().hasHeightForWidth())
+
         self.Rolluik1Widget.setSizePolicy(sizePolicy)
         self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
         self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 160))
@@ -138,12 +140,15 @@ class Ui_MainWindow(object):
         self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
         self.Rolluik1.setGeometry(QtCore.QRect(10, 10, 47, 13))
         self.Rolluik1.setObjectName("Rolluik1")
+
         self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Status1.setGeometry(QtCore.QRect(270, 130, 91, 20))
+        self.Status1.setGeometry(QtCore.QRect(150, 130, 200, 20))
+
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Status1.sizePolicy().hasHeightForWidth())
+
         self.Status1.setSizePolicy(sizePolicy)
         self.Status1.setAcceptDrops(False)
         self.Status1.setLayoutDirection(QtCore.Qt.RightToLeft)
@@ -153,6 +158,7 @@ class Ui_MainWindow(object):
         self.Status1.setTextFormat(QtCore.Qt.PlainText)
         self.Status1.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.Status1.setObjectName("Status1")
+
         self.Rolluik1.raise_()
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 3, 1, 1)
@@ -174,6 +180,7 @@ class Ui_MainWindow(object):
         self.Settings.clicked.connect(self.changeSettings)
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -207,9 +214,14 @@ class Ui_MainWindow(object):
 
     def showInfo(self):
         info = QMessageBox()
+        s = stringNames()
+        string = s.getInfoText()
+        title_text = string.split(";",)
+        title = title_text[0]
+        text = title_text[1]
         info.setIcon(QMessageBox.Information)
-        info.setText("Aeros dev is cool.")
-        info.setInformativeText("Like really, really cool")
+        info.setText(title)
+        info.setInformativeText(text)
         info.setWindowTitle("Info")
         info.setStandardButtons(QMessageBox.Cancel)
         info.exec_()
