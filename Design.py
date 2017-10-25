@@ -14,6 +14,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -22,39 +23,50 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
+
         spacerItem = QtWidgets.QSpacerItem(20, 60, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.verticalLayout.addItem(spacerItem)
+
         self.Manual = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Manual.setObjectName("Manual")
         self.verticalLayout.addWidget(self.Manual)
+
         self.Graphs = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Graphs.setObjectName("Graphs")
         self.verticalLayout.addWidget(self.Graphs)
+
         self.Settings = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Settings.setObjectName("Settings")
         self.verticalLayout.addWidget(self.Settings)
+
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
+
         self.Info = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Info.setObjectName("Info")
         self.verticalLayout.addWidget(self.Info)
+
         spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem2)
+
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 52))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
         self.Logo = QtWidgets.QLabel(self.horizontalLayoutWidget)
         self.Logo.setEnabled(True)
+
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Logo.sizePolicy().hasHeightForWidth())
+
         self.Logo.setSizePolicy(sizePolicy)
-        self.Logo.setMinimumSize(QtCore.QSize(200, 0))
-        self.Logo.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.Logo.setMinimumSize(QtCore.QSize(0, 0))
+        self.Logo.setMaximumSize(QtCore.QSize(300, 100))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(16)
@@ -66,7 +78,7 @@ class Ui_MainWindow(object):
         self.Logo.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Logo.setObjectName("Logo")
         self.horizontalLayout_2.addWidget(self.Logo)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem3)
         self.fSkyTemp = QtWidgets.QFrame(self.horizontalLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
@@ -158,7 +170,7 @@ class Ui_MainWindow(object):
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
         self.Settings.setText(_translate("MainWindow", "Settings"))
         self.Info.setText(_translate("MainWindow", "Info"))
-        self.Logo.setText(_translate("MainWindow", "     Aeros Develment"))
+        self.Logo.setText(_translate("MainWindow", "     Aeros Development"))
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
         self.Rolluik1.setText(_translate("MainWindow", "Rolluik $"))
