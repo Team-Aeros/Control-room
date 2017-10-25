@@ -219,10 +219,7 @@ class Ui_MainWindow(object):
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            sw = QtWidgets.QWidget()
-            ui = settingsWindow()
-            ui.setupSettingsWindowUi(sw)
-            sw.show()
+            settingsWindow()
 
         except:
             print("failed")

@@ -69,12 +69,12 @@ class settingsWindow(object):
         self.chgMinTemp.setText(_translate("Form", "Change Min temp value"))
         self.chgMaxTemp.setText(_translate("Form", "Change Max temp value"))
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = settingsWindow()
-    ui.setupUi(Form)
+    ui.setupSettingsWindowUi(Form)
     Form.show()
-    sys.exit(app.exec_())"""
+    sys.exit(app.exec_())
 
