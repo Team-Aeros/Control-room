@@ -181,7 +181,7 @@ class Ui_MainWindow(object):
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
         self.Settings.setText(_translate("MainWindow", "Settings"))
         self.Info.setText(_translate("MainWindow", "Info"))
-        self.Logo.setText(_translate("MainWindow", "     Aeros Development"))
+        self.Logo.setText(_translate("MainWindow", "Aeros Development"))
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
@@ -213,7 +213,7 @@ class Ui_MainWindow(object):
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            s = settingsWindow()
+            s = SettingsWindow()
             s.show()
         except:
             print("failed")
