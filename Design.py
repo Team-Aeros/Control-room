@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
 from stringNames import *
 from settings import *
+from Device import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -193,8 +194,16 @@ class Ui_MainWindow(object):
         self.Logo.setText(_translate("MainWindow", "     Aeros Development"))
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
-        self.Rolluik1.setText(_translate("MainWindow", "Rolluik $"))
-        self.Status1.setText(_translate("MainWindow", "Status: Uitgerold"))
+
+        device1 = Device("rolluik 1", False, 0, 0)
+        status = ""
+        if device1.getStatus() == False:
+            status = "ingerold"
+        elif device1.getStatus() == True:
+            status = "uitgerold"
+
+        self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
+        self.Status1.setText(_translate("MainWindow", "Status: " + status))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
 
     def toggleManual(self):
