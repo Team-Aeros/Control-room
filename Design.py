@@ -196,14 +196,9 @@ class Ui_MainWindow(object):
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
         device1 = Device("rolluik 1", False, 0, 0)
-        status = ""
-        if device1.getStatus() == False:
-            status = "ingerold"
-        elif device1.getStatus() == True:
-            status = "uitgerold"
 
         self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
-        self.Status1.setText(_translate("MainWindow", "Status: " + status))
+        self.Status1.setText(_translate("MainWindow", "Status: " + device1.getStatus()))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
 
 
@@ -230,7 +225,7 @@ class Ui_MainWindow(object):
         print("Allows the changing of min and max roll uit values")
         try:
             s = settingsWindow()
-            s.show(True)
+            s.show()
         except:
             print("failed")
             pass

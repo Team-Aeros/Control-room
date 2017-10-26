@@ -20,7 +20,13 @@ class Device():
         return self.name
 
     def getStatus(self):
-        return self.status
+        if self.status == False:
+            return "Ingerold"
+        elif self.status == True:
+            return "Uitgerold"
+
+    def changeStatus(self, status):
+        self.status
 
 
 

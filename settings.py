@@ -52,8 +52,8 @@ class settingsWindow():
         self.chgMinLight.setText(_translate("Form", title_text[1]))
         self.chgMinTemp.setText(_translate("Form", title_text[2]))
 
-    def show(self, set):
-        if set == True:
+    def show(self):
+        if __name__ == "__main__":
             import sys
             app = QtWidgets.QApplication(sys.argv)
             Form = QtWidgets.QWidget()
@@ -62,8 +62,6 @@ class settingsWindow():
             Form.show()
             sys.exit(app.exec_())
 
-s = settingsWindow()
-s.show(True)
 
 
 
