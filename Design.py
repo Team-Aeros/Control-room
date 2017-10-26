@@ -11,7 +11,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
 from stringNames import *
-from settings import *
+#from settings import *
+from SettingsWindow import *
 from Device import *
 
 class Ui_MainWindow(object):
@@ -124,7 +125,7 @@ class Ui_MainWindow(object):
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
-        self.gridLayout_3.setContentsMargins(40, 0, 0, 0)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
 
         self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
@@ -163,7 +164,7 @@ class Ui_MainWindow(object):
 
         self.Rolluik1.raise_()
         self.Status1.raise_()
-        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 3, 1, 1)
+        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -210,11 +211,12 @@ class Ui_MainWindow(object):
     def showGraphs(self):
         print("Shows 2 graphs, temp and light")
 
+
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            s = SettingsWindow()
-            s.show()
+            SettingsWindow()
+            sw = SettingsWindow.getLayout()
         except:
             print("failed")
             pass
