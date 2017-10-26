@@ -7,8 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from stringNames import *
 
-class settingsWindow(object):
+class settingsWindow():
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(422, 87)
@@ -42,18 +43,28 @@ class settingsWindow(object):
         pass
 
     def retranslateUi(self, Form):
+        s = stringNames()
+        s.setSettingsText("Change settings", "Change Min light value", "Change Min temp value")
+        string = s.getSettingsText()
+        title_text = string.split(";")
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Change settings"))
-        self.chgMinLight.setText(_translate("Form", "Change Min light value"))
-        self.chgMinTemp.setText(_translate("Form", "Change Min temp value"))
+        Form.setWindowTitle(_translate("Form", title_text[0]))
+        self.chgMinLight.setText(_translate("Form", title_text[1]))
+        self.chgMinTemp.setText(_translate("Form", title_text[2]))
+
+    def show(self, set):
+        if set == True:
+            import sys
+            app = QtWidgets.QApplication(sys.argv)
+            Form = QtWidgets.QWidget()
+            ui = settingsWindow()
+            ui.setupUi(Form)
+            Form.show()
+            sys.exit(app.exec_())
+
+s = settingsWindow()
+s.show(True)
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
-    ui = settingsWindow()
-    ui.setupUi(Form)
-    Form.show()
-    sys.exit(app.exec_())
+
 

@@ -206,13 +206,14 @@ class Ui_MainWindow(object):
         self.Status1.setText(_translate("MainWindow", "Status: " + status))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
 
+
     def toggleManual(self):
         print("Popup that allows to roll out shutter")
         try:
             s = stringNames()
             s.setManualText("Give percentage", "percentage: ")
             string = s.getManualText()
-            title_text = string.split(";", )
+            title_text = string.split(";")
             title = title_text[0]
             text = title_text[1]
 
@@ -228,10 +229,8 @@ class Ui_MainWindow(object):
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            Form = QtWidgets.QWidget()
-            ui = settingsWindow()
-            ui.setupUi(Form)
-            Form.show()
+            s = settingsWindow()
+            s.show(True)
         except:
             print("failed")
             pass
