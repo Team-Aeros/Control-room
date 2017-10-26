@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
 from stringNames import *
 from settings import *
+from Device import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -164,16 +165,6 @@ class Ui_MainWindow(object):
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 3, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 918, 21))
-        self.menubar.setObjectName("menubar")
-        self.menuMenu = QtWidgets.QMenu(self.menubar)
-        self.menuMenu.setObjectName("menuMenu")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
         self.Manual.clicked.connect(self.toggleManual)
@@ -190,12 +181,15 @@ class Ui_MainWindow(object):
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
         self.Settings.setText(_translate("MainWindow", "Settings"))
         self.Info.setText(_translate("MainWindow", "Info"))
-        self.Logo.setText(_translate("MainWindow", "     Aeros Development"))
+        self.Logo.setText(_translate("MainWindow", "Aeros Development"))
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
-        self.Rolluik1.setText(_translate("MainWindow", "Rolluik $"))
-        self.Status1.setText(_translate("MainWindow", "Status: Uitgerold"))
-        self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
+
+        device1 = Device("rolluik 1", False, 0, 0)
+
+        self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
+        self.Status1.setText(_translate("MainWindow", "Status: " + device1.getStatus()))
+
 
     def toggleManual(self):
         print("Popup that allows to roll out shutter")
@@ -203,7 +197,7 @@ class Ui_MainWindow(object):
             s = stringNames()
             s.setManualText("Give percentage", "percentage: ")
             string = s.getManualText()
-            title_text = string.split(";", )
+            title_text = string.split(";")
             title = title_text[0]
             text = title_text[1]
 
@@ -219,11 +213,8 @@ class Ui_MainWindow(object):
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            sw = QtWidgets.QWidget()
-            ui = settingsWindow()
-            ui.setupSettingsWindowUi(sw)
-            sw.show()
-
+            s = SettingsWindow()
+            s.show()
         except:
             print("failed")
             pass
