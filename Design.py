@@ -165,16 +165,6 @@ class Ui_MainWindow(object):
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 3, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 918, 21))
-        self.menubar.setObjectName("menubar")
-        self.menuMenu = QtWidgets.QMenu(self.menubar)
-        self.menuMenu.setObjectName("menuMenu")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
         self.Manual.clicked.connect(self.toggleManual)
@@ -199,7 +189,6 @@ class Ui_MainWindow(object):
 
         self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
         self.Status1.setText(_translate("MainWindow", "Status: " + device1.getStatus()))
-        self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
 
 
     def toggleManual(self):
