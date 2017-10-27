@@ -13,7 +13,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QG
 from stringNames import *
 from Device import *
 
+#Main window
 class Ui_MainWindow(object):
+    #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
@@ -118,16 +120,17 @@ class Ui_MainWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
 
-        self.setupDeviceWindow(MainWindow)
-
+        self.setupDeviceWindow()        #sets up device window
+        self.retranslateUi(MainWindow)  #sets te text
 
         self.Manual.clicked.connect(self.toggleManual)
         self.Graphs.clicked.connect(self.showGraphs)
-        self.Settings.clicked.connect(self.changeSettings)
+        self.Settings.clicked.connect(self.setupSettingsWindow)
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def setupDeviceWindow(self, MW):
+    #sets up the ui in which you can see the devices
+    def setupDeviceWindow(self):
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -174,36 +177,36 @@ class Ui_MainWindow(object):
         self.Rolluik1.raise_()
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
-        MW.setCentralWidget(self.centralwidget)
-        self.retranslateUi(MW)
+        MainWindow.setCentralWidget(self.centralwidget)     #changes central widget
 
-    def setupSettingsWindow(self, ):
-        settingsWindowWidget = QtWidgets.QWidget(self.centralwidget)
-        settingsWindowWidget.setMinimumSize(QtCore.QSize(400,150))
-        settingsWindowWidget.setMaximumSize(QtCore.QSize(400,150))
+    #sets up settingswidget that shows the settings
+    def setupSettingsWindow(self):
+        self.settingsWindowWidget = QtWidgets.QWidget(self.centralwidget)
+        self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,150))
+        self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,150))
 
-        layout = QtWidgets.QFormLayout(settingsWindowWidget)
-        minLight = QtWidgets.QLineEdit(settingsWindowWidget)
-        minTemp = QtWidgets.QLineEdit(settingsWindowWidget)
+        self.layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
+        self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
 
-        chgMinLight = QtWidgets.QPushButton(settingsWindowWidget)
-        chgMinLight.setText("Change the min light value")
+        self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinLight.setText("Change the min light value")
 
-        chgMinTemp = QtWidgets.QPushButton(settingsWindowWidget)
-        chgMinTemp.setText("Change the min temp value")
+        self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinTemp.setText("Change the min temp value")
 
-        goBack = QtWidgets.QPushButton(settingsWindowWidget)
-        goBack.setText("Ok")
-        goBack.clicked.connect(self.setupDeviceWindow)
+        self.goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.goBack.setText("Ok")
+        self.goBack.clicked.connect(self.setupDeviceWindow)
 
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, minTemp)
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, chgMinTemp)
-        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
-        #self.gridLayout_3.addWidget(settingsWindowWidget, 0, 1, 1, 0)
-        MainWindow.setCentralWidget(settingsWindowWidget)
+        self.layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
+        self.layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
+        self.layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
+        self.layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
+        self.layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
+        MainWindow.setCentralWidget(self.settingsWindowWidget)  #changes central widget
 
+    #sets te text
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -220,7 +223,7 @@ class Ui_MainWindow(object):
         self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
         self.Status1.setText(_translate("MainWindow", "Status: " + device1.getStatus()))
 
-
+    #makes inputdialog in which you can enter a percentage
     def toggleManual(self):
         print("Popup that allows to roll out shutter")
         try:
@@ -237,18 +240,11 @@ class Ui_MainWindow(object):
         except:
             pass
 
+    #changes the central widget to graphs widget
     def showGraphs(self):
         print("Shows 2 graphs, temp and light")
 
-
-    def changeSettings(self):
-        print("Allows the changing of min and max roll uit values")
-        try:
-            self.setupSettingsWindow()
-        except:
-            print("failed")
-            pass
-
+    #Makes popup with info
     def showInfo(self):
         info = QMessageBox()
 
