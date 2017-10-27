@@ -11,8 +11,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
 from stringNames import *
-#from settings import *
-from SettingsWindow import *
 from Device import *
 
 class Ui_MainWindow(object):
@@ -120,6 +118,16 @@ class Ui_MainWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
 
+        self.setupDeviceWindow(MainWindow)
+
+
+        self.Manual.clicked.connect(self.toggleManual)
+        self.Graphs.clicked.connect(self.showGraphs)
+        self.Settings.clicked.connect(self.changeSettings)
+        self.Info.clicked.connect(self.showInfo)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def setupDeviceWindow(self, MW):
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -129,7 +137,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName("gridLayout_3")
 
         self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
+                                           QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Rolluik1Widget.sizePolicy().hasHeightForWidth())
@@ -159,21 +168,41 @@ class Ui_MainWindow(object):
         self.Status1.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.Status1.setFrameShadow(QtWidgets.QFrame.Plain)
         self.Status1.setTextFormat(QtCore.Qt.PlainText)
-        self.Status1.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.Status1.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.Status1.setObjectName("Status1")
 
         self.Rolluik1.raise_()
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
-        MainWindow.setCentralWidget(self.centralwidget)
+        MW.setCentralWidget(self.centralwidget)
+        self.retranslateUi(MW)
 
-        self.retranslateUi(MainWindow)
-        self.Manual.clicked.connect(self.toggleManual)
-        self.Graphs.clicked.connect(self.showGraphs)
-        self.Settings.clicked.connect(self.changeSettings)
-        self.Info.clicked.connect(self.showInfo)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+    def setupSettingsWindow(self, ):
+        settingsWindowWidget = QtWidgets.QWidget(self.centralwidget)
+        settingsWindowWidget.setMinimumSize(QtCore.QSize(400,150))
+        settingsWindowWidget.setMaximumSize(QtCore.QSize(400,150))
 
+        layout = QtWidgets.QFormLayout(settingsWindowWidget)
+        minLight = QtWidgets.QLineEdit(settingsWindowWidget)
+        minTemp = QtWidgets.QLineEdit(settingsWindowWidget)
+
+        chgMinLight = QtWidgets.QPushButton(settingsWindowWidget)
+        chgMinLight.setText("Change the min light value")
+
+        chgMinTemp = QtWidgets.QPushButton(settingsWindowWidget)
+        chgMinTemp.setText("Change the min temp value")
+
+        goBack = QtWidgets.QPushButton(settingsWindowWidget)
+        goBack.setText("Ok")
+        goBack.clicked.connect(self.setupDeviceWindow)
+
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, minTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, chgMinTemp)
+        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
+        #self.gridLayout_3.addWidget(settingsWindowWidget, 0, 1, 1, 0)
+        MainWindow.setCentralWidget(settingsWindowWidget)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -215,8 +244,7 @@ class Ui_MainWindow(object):
     def changeSettings(self):
         print("Allows the changing of min and max roll uit values")
         try:
-            SettingsWindow()
-            sw = SettingsWindow.getLayout()
+            self.setupSettingsWindow()
         except:
             print("failed")
             pass

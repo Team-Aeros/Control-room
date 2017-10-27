@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication
+from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtWidgets
-import sys
+
 
 class SettingsWindow(QWidget):
     def __init__(self):
