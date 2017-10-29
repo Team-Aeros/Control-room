@@ -19,6 +19,8 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
+        self.devices = []
+        self.addDevice("rolluik 1", False, 0, 0)
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -129,6 +131,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.setupDeviceWindow()       #sets up device window
 
+
         self.Manual.clicked.connect(self.toggleManual)
         self.Graphs.clicked.connect(self.showGraphs)
         self.Settings.clicked.connect(self.setupSettingsWindow)
@@ -198,16 +201,30 @@ class Ui_MainWindow(object):
         self.goBack.setText("Ok")
         self.goBack.clicked.connect(self.setupDeviceWindow)
 
+        self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
+        for device in self.devices:
+            self.devicesBox.addItem(device.getName())
+        self.devicesBox.activated[str].connect(self.setCurrentDevice)
+
         self.layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
         self.layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
         self.layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
         self.layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
         self.layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
+        self.layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
 
         self.gridLayout_3.removeWidget(self.Rolluik1Widget)
         self.Status1.hide()
         self.gridLayout_3.addWidget(self.settingsWindowWidget, 0, 0, 0, 0)
         MainWindow.setCentralWidget(self.centralwidget)  #changes central widget
+
+    def addDevice(self, name, status, minLight, minTemp):
+        self.devices.append(Device(name,status,minLight,minTemp))
+
+    def setCurrentDevice(self, name):
+        for device in self.devices:
+            if device.getName() == name:
+                self.currentDevice = device
 
     #sets te text
     def retranslateUi(self, MainWindow):
@@ -221,10 +238,8 @@ class Ui_MainWindow(object):
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
-        device1 = Device("rolluik 1", False, 0, 0)
-
-        self.Rolluik1.setText(_translate("MainWindow", device1.getName()))
-        self.Status1.setText(_translate("MainWindow", "Status: " + device1.getStatus()))
+        self.Rolluik1.setText(_translate("MainWindow", self.devices[0].getName()))
+        self.Status1.setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))
 
     #makes inputdialog in which you can enter a percentage
     def toggleManual(self):
