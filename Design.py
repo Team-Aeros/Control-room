@@ -120,8 +120,14 @@ class Ui_MainWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
 
-        self.setupDeviceWindow()        #sets up device window
-        self.retranslateUi(MainWindow)  #sets te text
+        self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))   #90, 60, 781, 501
+        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.setupDeviceWindow()       #sets up device window
 
         self.Manual.clicked.connect(self.toggleManual)
         self.Graphs.clicked.connect(self.showGraphs)
@@ -131,14 +137,6 @@ class Ui_MainWindow(object):
 
     #sets up the ui in which you can see the devices
     def setupDeviceWindow(self):
-        self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-
         self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
                                            QtWidgets.QSizePolicy.MinimumExpanding)
@@ -148,7 +146,7 @@ class Ui_MainWindow(object):
 
         self.Rolluik1Widget.setSizePolicy(sizePolicy)
         self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
-        self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 160))
+        self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
         self.Rolluik1Widget.setMouseTracking(False)
         self.Rolluik1Widget.setAutoFillBackground(True)
         self.Rolluik1Widget.setObjectName("Rolluik1Widget")
@@ -157,7 +155,7 @@ class Ui_MainWindow(object):
         self.Rolluik1.setObjectName("Rolluik1")
 
         self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Status1.setGeometry(QtCore.QRect(150, 130, 200, 20))
+        self.Status1.setGeometry(QtCore.QRect(150, 65, 100, 20))
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -178,12 +176,13 @@ class Ui_MainWindow(object):
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
         MainWindow.setCentralWidget(self.centralwidget)     #changes central widget
+        self.retranslateUi(MainWindow)  # sets te text
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
-        self.settingsWindowWidget = QtWidgets.QWidget(self.centralwidget)
-        self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,150))
-        self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,150))
+        self.settingsWindowWidget = QtWidgets.QWidget(self.gridLayoutWidget)
+        self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,160))
+        self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,160))
 
         self.layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
         self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
@@ -204,7 +203,11 @@ class Ui_MainWindow(object):
         self.layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
         self.layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
         self.layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
-        MainWindow.setCentralWidget(self.settingsWindowWidget)  #changes central widget
+
+        self.gridLayout_3.removeWidget(self.Rolluik1Widget)
+        self.Status1.hide()
+        self.gridLayout_3.addWidget(self.settingsWindowWidget, 0, 0, 0, 0)
+        MainWindow.setCentralWidget(self.centralwidget)  #changes central widget
 
     #sets te text
     def retranslateUi(self, MainWindow):
