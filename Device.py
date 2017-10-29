@@ -2,13 +2,16 @@
 class Device():
     def __init__(self,
                       name,
-                      status,
-                      min_light = 0,
-                      min_temp = 0):
+                      portNumber,
+                      sensorType,
+                      min_light=0,
+                      min_temp=0):
         self.name = name            #string
-        self.status = status        #bool
+        self.status = False        #bool
         self.setMinLight(min_light)
         self.setMinTemp(min_temp)
+        self.portNumber = portNumber
+        self.sensorType = sensorType
 
     def setMinLight(self, val):
         self.min_light = val
