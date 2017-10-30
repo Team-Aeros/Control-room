@@ -127,40 +127,35 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
+        self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
+        self.stackedWidget.setMinimumSize(QtCore.QSize(0, 400))
 
-        self.page_0 = QtWidgets.QWidget()
-        self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))   #90, 60, 781, 501
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.stackedWidget.insertWidget(0,self.page_0)
+        self.setupDeviceWindow()
+        self.setupSettingsWindow()
         self.stackedWidget.setCurrentIndex(0)
 
-        self.setupSettingsWindow()
-
-        self.addADevice.clicked.connect(self.enterDevice)
+        self.addADevice.clicked.connect(lambda: self.setIndex(2))
         self.Manual.clicked.connect(self.toggleManual)
         self.Graphs.clicked.connect(self.showGraphs)
-        self.Settings.clicked.connect(self.setSettingIndex)
+        self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.setupDeviceWindow()
+        MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
 
-    def setSettingIndex(self):
-        self.stackedWidget.setCurrentIndex(1)
+    def setIndex(self, index):
+        self.stackedWidget.setCurrentIndex(index)
         print (self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
         self.sensorType = type
 
     def enterDevice(self):
+        self.page_2 = QtWidgets.QWidget()
         self.sensorType = ""
-        self.enterDeviceWidget = QtWidgets.QWidget(self.gridLayoutWidget)
+        self.enterDeviceWidget = QtWidgets.QWidget(self.page_2)
         self.enterDeviceWidget.setMinimumSize(QtCore.QSize(400, 180))
         self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 180))
 
@@ -216,10 +211,19 @@ class Ui_MainWindow(object):
         self.gridLayout_3.removeWidget(self.Rolluik1Widget)
         self.Status1.hide()
         self.gridLayout_3.addWidget(self.enterDeviceWidget, 0, 0, 0, 0)
-        MainWindow.setCentralWidget(self.centralwidget)  # changes central widget
+        self.stackedWidget.addWidget(self.page_2)
 
     #sets up the ui in which you can see the devices
     def setupDeviceWindow(self):
+        self.page_0 = QtWidgets.QWidget(MainWindow)
+        self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))  # 90, 60, 781, 501
+        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
+        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+
         self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
                                            QtWidgets.QSizePolicy.MinimumExpanding)
@@ -258,7 +262,9 @@ class Ui_MainWindow(object):
         self.Rolluik1.raise_()
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
-        MainWindow.setCentralWidget(self.centralwidget)     #changes central widget
+
+        self.stackedWidget.addWidget(self.page_0)
+        self.stackedWidget.setCurrentIndex(0)
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
@@ -293,9 +299,8 @@ class Ui_MainWindow(object):
         layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
         layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, devicesBox)
 
-        self.stackedWidget.insertWidget(1,self.page_1)
+        self.stackedWidget.addWidget(self.page_1)
 
-        #MainWindow.setCentralWidget(self.centralwidget)  #changes central widget
 
     def addDevice(self, name, port ,sensor,  minLight, minTemp,):
         self.devices.append(Device(name, port, sensor, minLight, minTemp))
