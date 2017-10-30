@@ -132,6 +132,7 @@ class Ui_MainWindow(object):
 
         self.setupDeviceWindow()
         self.setupSettingsWindow()
+        self.setupEnterDevice()
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
@@ -141,77 +142,15 @@ class Ui_MainWindow(object):
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.setupDeviceWindow()
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
 
     def setIndex(self, index):
         self.stackedWidget.setCurrentIndex(index)
-        print (self.stackedWidget.currentIndex())
+        print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
         self.sensorType = type
-
-    def enterDevice(self):
-        self.page_2 = QtWidgets.QWidget()
-        self.sensorType = ""
-        self.enterDeviceWidget = QtWidgets.QWidget(self.page_2)
-        self.enterDeviceWidget.setMinimumSize(QtCore.QSize(400, 180))
-        self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 180))
-
-        layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
-        namelabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("name")
-        lightlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min light")
-        templabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min temp")
-        portlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Port number")
-        sensorlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Sensor type")
-
-        name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
-        light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
-        temp = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
-        port = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("COM0")
-
-        name.setText("")
-        light.setText("0")
-        temp.setText("0")
-        port.setText("COM0")
-
-        self.nameRes = name.text()
-        self.portRes = port.text()
-        self.lightRes = int(light.text())
-        self.tempRes = int(temp.text())
-
-        sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
-        sensor.addItem("Light")
-        sensor.addItem("Temperature")
-        sensor.activated[str].connect(self.setSensorType)
-
-        addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
-        addDevice.setText("Add Device")
-        addDevice.clicked.connect(self.addDeviceNoPar)
-
-        goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
-        goBack.setText("Ok")
-        goBack.clicked.connect(self.setupDeviceWindow)
-
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, lightlabel)
-        layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, templabel)
-        layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, portlabel)
-        layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, sensorlabel)
-        layout.setWidget(5, QtWidgets.QFormLayout.LabelRole, addDevice)
-
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, name)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, light)
-        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, temp)
-        layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, port)
-        layout.setWidget(4, QtWidgets.QFormLayout.FieldRole, sensor)
-        layout.setWidget(5, QtWidgets.QFormLayout.FieldRole, goBack)
-
-        self.gridLayout_3.removeWidget(self.Rolluik1Widget)
-        self.Status1.hide()
-        self.gridLayout_3.addWidget(self.enterDeviceWidget, 0, 0, 0, 0)
-        self.stackedWidget.addWidget(self.page_2)
 
     #sets up the ui in which you can see the devices
     def setupDeviceWindow(self):
@@ -263,8 +202,9 @@ class Ui_MainWindow(object):
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
 
+        #self.stackedWidget.insertWidget(0,self.page_0)
         self.stackedWidget.addWidget(self.page_0)
-        self.stackedWidget.setCurrentIndex(0)
+        #self.stackedWidget.setCurrentIndex(0)
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
@@ -285,7 +225,7 @@ class Ui_MainWindow(object):
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
-        goBack.clicked.connect(self.setupDeviceWindow)
+        goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
         devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
         for device in self.devices:
@@ -299,8 +239,67 @@ class Ui_MainWindow(object):
         layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
         layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, devicesBox)
 
+        #self.stackedWidget.insertWidget(1,self.page_1)
         self.stackedWidget.addWidget(self.page_1)
 
+    def setupEnterDevice(self):
+        self.page_2 = QtWidgets.QWidget()
+        self.sensorType = ""
+        self.enterDeviceWidget = QtWidgets.QWidget(self.page_2)
+        self.enterDeviceWidget.setMinimumSize(QtCore.QSize(400, 180))
+        self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 180))
+
+        layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
+        namelabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("name")
+        lightlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min light")
+        templabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min temp")
+        portlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Port number")
+        sensorlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Sensor type")
+
+        name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
+        light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
+        temp = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
+        port = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("COM0")
+
+        name.setText("")
+        light.setText("0")
+        temp.setText("0")
+        port.setText("COM0")
+
+        self.nameRes = name.text()
+        self.portRes = port.text()
+        self.lightRes = int(light.text())
+        self.tempRes = int(temp.text())
+
+        sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
+        sensor.addItem("Light")
+        sensor.addItem("Temperature")
+        sensor.activated[str].connect(self.setSensorType)
+
+        addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
+        addDevice.setText("Add Device")
+        addDevice.clicked.connect(self.addDeviceNoPar)
+
+        goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
+        goBack.setText("Ok")
+        goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
+        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, lightlabel)
+        layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, templabel)
+        layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, portlabel)
+        layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, sensorlabel)
+        layout.setWidget(5, QtWidgets.QFormLayout.LabelRole, addDevice)
+
+        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, name)
+        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, light)
+        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, temp)
+        layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, port)
+        layout.setWidget(4, QtWidgets.QFormLayout.FieldRole, sensor)
+        layout.setWidget(5, QtWidgets.QFormLayout.FieldRole, goBack)
+
+        #self.stackedWidget.insertWidget(2,self.page_2)
+        self.stackedWidget.addWidget(self.page_2)
 
     def addDevice(self, name, port ,sensor,  minLight, minTemp,):
         self.devices.append(Device(name, port, sensor, minLight, minTemp))
