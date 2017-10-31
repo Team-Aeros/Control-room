@@ -124,6 +124,7 @@ class Ui_MainWindow(object):
         spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem4)
 
+
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
         self.stackedWidget.setMinimumSize(QtCore.QSize(400, 300))
@@ -165,12 +166,25 @@ class Ui_MainWindow(object):
         self.page_0 = QtWidgets.QWidget(MainWindow)
         self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 800, 500))  # 90, 60, 781, 501
+
+        self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))   #90, 60, 781, 501
+
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
+        self.setupDeviceWindow()       #sets up device window
 
+        self.Manual.clicked.connect(self.toggleManual)
+        self.Graphs.clicked.connect(self.showGraphs)
+        self.Settings.clicked.connect(self.setupSettingsWindow)
+        self.Info.clicked.connect(self.showInfo)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    #sets up the ui in which you can see the devices
+    def setupDeviceWindow(self):
         self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
                                            QtWidgets.QSizePolicy.MinimumExpanding)
@@ -181,6 +195,10 @@ class Ui_MainWindow(object):
         self.Rolluik1Widget.setSizePolicy(sizePolicy)
         self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
         self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
+
+        self.Rolluik1Widget.setMouseTracking(False)
+        self.Rolluik1Widget.setAutoFillBackground(True)
+
         self.Rolluik1Widget.setObjectName("Rolluik1Widget")
         self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
         self.Rolluik1.setGeometry(QtCore.QRect(100, 100, 470, 130))
@@ -207,6 +225,7 @@ class Ui_MainWindow(object):
         self.Rolluik1.raise_()
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
+
 
         #self.stackedWidget.insertWidget(0,self.page_0)
         self.stackedWidget.addWidget(self.page_0)
@@ -318,6 +337,40 @@ class Ui_MainWindow(object):
             if device.getName() == name:
                 self.currentDevice = device
 
+        MainWindow.setCentralWidget(self.centralwidget)     #changes central widget
+        self.retranslateUi(MainWindow)  # sets te text
+
+    #sets up settingswidget that shows the settings
+    def setupSettingsWindow(self):
+        self.settingsWindowWidget = QtWidgets.QWidget(self.gridLayoutWidget)
+        self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,160))
+        self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,160))
+
+        self.layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
+        self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
+
+        self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinLight.setText("Change the min light value")
+
+        self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinTemp.setText("Change the min temp value")
+
+        self.goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.goBack.setText("Ok")
+        self.goBack.clicked.connect(self.setupDeviceWindow)
+
+        self.layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
+        self.layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
+        self.layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
+        self.layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
+        self.layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
+
+        self.gridLayout_3.removeWidget(self.Rolluik1Widget)
+        self.Status1.hide()
+        self.gridLayout_3.addWidget(self.settingsWindowWidget, 0, 0, 0, 0)
+        #MainWindow.setCentralWidget(self.centralwidget)  #changes central widge
+
     #sets te text
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -331,8 +384,6 @@ class Ui_MainWindow(object):
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
-        #self.Rolluik1.setText(_translate("MainWindow", self.devices[0].getName()))
-        #self.Status1.setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))
 
     #makes inputdialog in which you can enter a percentage
     def toggleManual(self):
