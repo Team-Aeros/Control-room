@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
-        self.stackedWidget.setMinimumSize(QtCore.QSize(0, 400))
+        self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
 
         self.setupDeviceWindow()
         self.setupSettingsWindow()
