@@ -149,10 +149,17 @@ class Ui_MainWindow(object):
         self.stackedWidget.setCurrentIndex(index)
 
         #update devices
+        #empty devicesBox
         for i in range(0, len(self.devicesBox)):
             self.devicesBox.removeItem(i)
+
+        #fill devicesBox
         for device in self.devices:
             self.devicesBox.addItem(device.getName())
+        #set Rolluik1 and Status1
+        if len(self.devices) > 0:
+            self.Rolluik1.setText(self.devices[0].getName())
+            self.Status1.setText(self.devices[0].getStatus())
         #self.devicesBox.activated[str].connect(self.setCurrentDevice)
         #print(self.stackedWidget.currentIndex())
 
@@ -292,7 +299,7 @@ class Ui_MainWindow(object):
         goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
         goBack.setText("Ok")
         goBack.setMaximumSize(QtCore.QSize(50,200))
-        goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        goBack.clicked.connect(lambda: self.setIndex(0))
 
         """layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
         layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, lightlabel)
