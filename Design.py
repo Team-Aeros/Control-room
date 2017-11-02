@@ -9,9 +9,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
-from stringNames import *
-from Device import *
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
+from stringNames import stringNames
+from Device import Device
+from Maingrid import MainGrid
 
 #Main window
 class Ui_MainWindow(object):
@@ -130,14 +131,17 @@ class Ui_MainWindow(object):
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
         self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
 
-        self.setupDeviceWindow()
+        #sets up maingrid and adds it to stacked widget
+        self.page_0 = QtWidgets.QWidget(MainWindow)
+        self.stackedWidget.addWidget(MainGrid(self.page_0).getPage())
+
         self.setupSettingsWindow()
         self.setupEnterDevice()
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
         self.Manual.clicked.connect(self.toggleManual)
-        self.Graphs.clicked.connect(self.showGraphs)
+        self.Graphs.clicked.connect(lambda: self.setIndex(3))
         self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -165,84 +169,6 @@ class Ui_MainWindow(object):
 
     def setSensorType(self, type):
         self.sensorType = type
-
-    def changeMinLight(self, minLight):
-        if self.checkStringForNumber(minLight):
-            minLigh = int(minLight)
-            self.currentDevice.setMinLight(minLigh)
-
-
-    def changeMinTemp(self, minTemp):
-        if self.checkStringForNumber(minTemp):
-            minTemp = int(minTemp)
-            self.currentDevice.setMinTemp(minTemp)
-
-    def checkStringForNumber(self, string):
-        numbers = ["0","1","2","3","4","5","6","7","8","9"]
-        if len(string) > 1:
-            if string not in numbers:
-                return False
-        else:
-            chrs = list(string)
-            for chr in chrs:
-                if chr not in chrs:
-                    return False
-        return True
-
-
-    #sets up the ui in which you can see the devices
-    def setupDeviceWindow(self):
-        self.page_0 = QtWidgets.QWidget(MainWindow)
-        self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))  # 90, 60, 781, 501
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-
-        self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Rolluik1Widget.sizePolicy().hasHeightForWidth())
-
-        self.Rolluik1Widget.setSizePolicy(sizePolicy)
-        self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
-        self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
-        self.Rolluik1Widget.setMouseTracking(False)
-        self.Rolluik1Widget.setAutoFillBackground(True)
-        self.Rolluik1Widget.setObjectName("Rolluik1Widget")
-        self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Rolluik1.setGeometry(QtCore.QRect(10, 10, 47, 13))
-        self.Rolluik1.setObjectName("Rolluik1")
-
-        self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Status1.setGeometry(QtCore.QRect(150, 65, 100, 20))
-
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Status1.sizePolicy().hasHeightForWidth())
-
-        self.Status1.setSizePolicy(sizePolicy)
-        self.Status1.setAcceptDrops(False)
-        self.Status1.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.Status1.setAutoFillBackground(True)
-        self.Status1.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.Status1.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.Status1.setTextFormat(QtCore.Qt.PlainText)
-        self.Status1.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.Status1.setObjectName("Status1")
-
-        self.Rolluik1.raise_()
-        self.Status1.raise_()
-        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
-
-        #self.stackedWidget.insertWidget(0,self.page_0)
-        self.stackedWidget.addWidget(self.page_0)
-        #self.stackedWidget.setCurrentIndex(0)
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
@@ -282,6 +208,13 @@ class Ui_MainWindow(object):
 
         #self.stackedWidget.insertWidget(1,self.page_1)
         self.stackedWidget.addWidget(self.page_1)
+
+    def setupGraphsWindow(self):
+        self.page_3 = QtWidgets.QWidget()
+        self.graphWidget = QtWidgets.QWidget(self.page_3)
+        self.graphWidget.setMinimumSize(QtCore.QSize(500, 500))
+
+        self.stackedWidget.addWidget(self.page_3)
 
     def setupEnterDevice(self):
         self.page_2 = QtWidgets.QWidget()
@@ -368,14 +301,10 @@ class Ui_MainWindow(object):
             device_added.setStandardButtons(QMessageBox.Cancel)
             device_added.exec_()
 
-
-
-
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
-                #print(type(self.currentDevice))
 
     #sets te text
     def retranslateUi(self, MainWindow):
@@ -411,8 +340,7 @@ class Ui_MainWindow(object):
             pass
 
     #changes the central widget to graphs widget
-    def showGraphs(self):
-        print("Shows 2 graphs, temp and light")
+
 
     #Makes popup with info
     def showInfo(self):
