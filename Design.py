@@ -166,6 +166,32 @@ class Ui_MainWindow(object):
     def setSensorType(self, type):
         self.sensorType = type
 
+    def changeMinLight(self, minLigh):
+        print(type(self.currentDevice))
+        if self.checkStringForNumber(minLigh):
+            minLigh = int(minLigh)
+            self.currentDevice.setMinLight(minLigh)
+        else:
+            print("Entered value is not a number!")
+
+    def changeMinTemp(self, minTemp):
+        if self.checkStringForNumber(minTemp):
+            minTemp = int(minTemp)
+            self.currentDevice.setMinTemp(minTemp)
+
+    def checkStringForNumber(self, string):
+        numbers = ["0","1","2","3","4","5","6","7","8","9"]
+        if len(string > 1):
+            if string not in numbers:
+                return False
+        else:
+            chrs = list(string)
+            for chr in chrs:
+                if chr not in chrs:
+                    return False
+        return True
+
+
     #sets up the ui in which you can see the devices
     def setupDeviceWindow(self):
         self.page_0 = QtWidgets.QWidget(MainWindow)
@@ -233,6 +259,7 @@ class Ui_MainWindow(object):
 
         chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinLight.setText("Change the min light value")
+        chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
 
         chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinTemp.setText("Change the min temp value")
@@ -280,15 +307,15 @@ class Ui_MainWindow(object):
         self.temp.setText("0")
         self.port.setText("COM0")
 
-        self.name.setMaximumSize(QtCore.QSize(50,200))
-        self.light.setMaximumSize(QtCore.QSize(50,200))
-        self.temp.setMaximumSize(QtCore.QSize(50,200))
-        self.port.setMaximumSize(QtCore.QSize(50,200))
+        self.name.setMaximumSize(QtCore.QSize(100,200))
+        self.light.setMaximumSize(QtCore.QSize(100,200))
+        self.temp.setMaximumSize(QtCore.QSize(100,200))
+        self.port.setMaximumSize(QtCore.QSize(100,200))
 
         sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
         sensor.addItem("Light")
         sensor.addItem("Temperature")
-        sensor.setMaximumSize(QtCore.QSize(50,200))
+        sensor.setMaximumSize(QtCore.QSize(100,200))
         sensor.activated[str].connect(self.setSensorType)
 
         addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
@@ -298,7 +325,7 @@ class Ui_MainWindow(object):
 
         goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
         goBack.setText("Ok")
-        goBack.setMaximumSize(QtCore.QSize(50,200))
+        goBack.setMaximumSize(QtCore.QSize(100,200))
         goBack.clicked.connect(lambda: self.setIndex(0))
 
         """layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
