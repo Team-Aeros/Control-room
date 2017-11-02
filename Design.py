@@ -166,6 +166,30 @@ class Ui_MainWindow(object):
     def setSensorType(self, type):
         self.sensorType = type
 
+    def changeMinLight(self, minLight):
+        if self.checkStringForNumber(minLight):
+            minLigh = int(minLight)
+            self.currentDevice.setMinLight(minLigh)
+
+
+    def changeMinTemp(self, minTemp):
+        if self.checkStringForNumber(minTemp):
+            minTemp = int(minTemp)
+            self.currentDevice.setMinTemp(minTemp)
+
+    def checkStringForNumber(self, string):
+        numbers = ["0","1","2","3","4","5","6","7","8","9"]
+        if len(string) > 1:
+            if string not in numbers:
+                return False
+        else:
+            chrs = list(string)
+            for chr in chrs:
+                if chr not in chrs:
+                    return False
+        return True
+
+
     #sets up the ui in which you can see the devices
     def setupDeviceWindow(self):
         self.page_0 = QtWidgets.QWidget(MainWindow)
@@ -234,8 +258,11 @@ class Ui_MainWindow(object):
         chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinLight.setText("Change the min light value")
 
+        chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
+
         chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinTemp.setText("Change the min temp value")
+        chgMinLight.clicked.connect(lambda: self.changeMinLight(minTemp.text()))
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
@@ -264,11 +291,11 @@ class Ui_MainWindow(object):
         self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 300))
 
         layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
-        namelabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("name")
-        lightlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min light")
-        templabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min temp")
-        portlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Port number")
-        sensorlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Sensor type")
+        namelabel = QLabel("name")
+        lightlabel = QLabel("Min light")
+        templabel = QLabel("Min temp")
+        portlabel = QLabel("Port number")
+        sensorlabel = QLabel("Sensor type")
 
         self.name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
         self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
@@ -280,15 +307,15 @@ class Ui_MainWindow(object):
         self.temp.setText("0")
         self.port.setText("COM0")
 
-        self.name.setMaximumSize(QtCore.QSize(50,200))
-        self.light.setMaximumSize(QtCore.QSize(50,200))
-        self.temp.setMaximumSize(QtCore.QSize(50,200))
-        self.port.setMaximumSize(QtCore.QSize(50,200))
+        self.name.setMaximumSize(QtCore.QSize(100,200))
+        self.light.setMaximumSize(QtCore.QSize(100,200))
+        self.temp.setMaximumSize(QtCore.QSize(100,200))
+        self.port.setMaximumSize(QtCore.QSize(100,200))
 
         sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
         sensor.addItem("Light")
         sensor.addItem("Temperature")
-        sensor.setMaximumSize(QtCore.QSize(50,200))
+        sensor.setMaximumSize(QtCore.QSize(100,200))
         sensor.activated[str].connect(self.setSensorType)
 
         addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
@@ -298,22 +325,8 @@ class Ui_MainWindow(object):
 
         goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
         goBack.setText("Ok")
-        goBack.setMaximumSize(QtCore.QSize(50,200))
+        goBack.setMaximumSize(QtCore.QSize(100,200))
         goBack.clicked.connect(lambda: self.setIndex(0))
-
-        """layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, lightlabel)
-        layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, templabel)
-        layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, portlabel)
-        layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, sensorlabel)
-        layout.setWidget(5, QtWidgets.QFormLayout.LabelRole, addDevice)
-
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, name)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, light)
-        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, temp)
-        layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, port)
-        layout.setWidget(4, QtWidgets.QFormLayout.FieldRole, sensor)
-        layout.setWidget(5, QtWidgets.QFormLayout.FieldRole, goBack)"""
 
         layout.addRow(namelabel, self.name)
         layout.addRow(lightlabel, self.light)
@@ -332,23 +345,37 @@ class Ui_MainWindow(object):
         portRes = self.port.text()
         lightRes = int(self.light.text())
         tempRes = int(self.temp.text())
-        if nameRes != "":
+        if nameRes == "":
+            print("must have name")
+        else:
+            for device in self.devices:
+                if device.getName() == nameRes:
+                    error = QMessageBox()
+                    error.setIcon(QMessageBox.Critical)
+                    error.setText("Error: Duplicate names")
+                    error.setInformativeText("There is already a device with that name")
+                    error.setWindowTitle("Error")
+                    error.exec()
+                    self.name.setText("")
+                    return
+
             new_device = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
             self.devices.append(new_device)
-
             device_added = QMessageBox()
             device_added.setIcon(QMessageBox.Information)
             device_added.setText("Device with name: " + nameRes + " has been added!")
             device_added.setWindowTitle("Info")
             device_added.setStandardButtons(QMessageBox.Cancel)
             device_added.exec_()
-        else:
-            print("must have name")
+
+
+
 
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
+                #print(type(self.currentDevice))
 
     #sets te text
     def retranslateUi(self, MainWindow):
