@@ -168,18 +168,23 @@ class Ui_MainWindow(object):
 
     def changeMinLight(self, minLight):
         if self.checkStringForNumber(minLight):
-            minLigh = int(minLight)
-            self.currentDevice.setMinLight(minLigh)
+            minLight = int(minLight)
+            self.currentDevice.setMinLight(minLight)
+        else:
+            print("Entered value is not a number!")
 
 
     def changeMinTemp(self, minTemp):
         if self.checkStringForNumber(minTemp):
             minTemp = int(minTemp)
             self.currentDevice.setMinTemp(minTemp)
+        else:
+            print("Entered value is not a number!")
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
-        if len(string) > 1:
+
+        if len(string > 1):
             if string not in numbers:
                 return False
         else:
@@ -257,6 +262,7 @@ class Ui_MainWindow(object):
 
         chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinLight.setText("Change the min light value")
+        chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
 
         chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
 
@@ -291,11 +297,13 @@ class Ui_MainWindow(object):
         self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 300))
 
         layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
+
         namelabel = QLabel("name")
         lightlabel = QLabel("Min light")
         templabel = QLabel("Min temp")
         portlabel = QLabel("Port number")
         sensorlabel = QLabel("Sensor type")
+
 
         self.name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
         self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
@@ -345,6 +353,7 @@ class Ui_MainWindow(object):
         portRes = self.port.text()
         lightRes = int(self.light.text())
         tempRes = int(self.temp.text())
+
         if nameRes == "":
             print("must have name")
         else:
@@ -368,14 +377,10 @@ class Ui_MainWindow(object):
             device_added.setStandardButtons(QMessageBox.Cancel)
             device_added.exec_()
 
-
-
-
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
-                #print(type(self.currentDevice))
 
     #sets te text
     def retranslateUi(self, MainWindow):
