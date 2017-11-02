@@ -170,6 +170,29 @@ class Ui_MainWindow(object):
     def setSensorType(self, type):
         self.sensorType = type
 
+    def changeMinLight(self, minLight):
+        if self.checkStringForNumber(minLight):
+            minLigh = int(minLight)
+            self.currentDevice.setMinLight(minLigh)
+
+
+    def changeMinTemp(self, minTemp):
+        if self.checkStringForNumber(minTemp):
+            minTemp = int(minTemp)
+            self.currentDevice.setMinTemp(minTemp)
+
+    def checkStringForNumber(self, string):
+        numbers = ["0","1","2","3","4","5","6","7","8","9"]
+        if len(string) > 1:
+            if string not in numbers:
+                return False
+        else:
+            chrs = list(string)
+            for chr in chrs:
+                if chr not in chrs:
+                    return False
+        return True
+
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
         self.page_1 = QtWidgets.QWidget()
@@ -183,7 +206,6 @@ class Ui_MainWindow(object):
 
         chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinLight.setText("Change the min light value")
-
         chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
 
         chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
@@ -278,6 +300,7 @@ class Ui_MainWindow(object):
         portRes = self.port.text()
         lightRes = int(self.light.text())
         tempRes = int(self.temp.text())
+
         if nameRes == "":
             print("must have name")
         else:
@@ -305,6 +328,7 @@ class Ui_MainWindow(object):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
+                #print(type(self.currentDevice))
 
     #sets te text
     def retranslateUi(self, MainWindow):
@@ -338,9 +362,6 @@ class Ui_MainWindow(object):
 
         except:
             pass
-
-    #changes the central widget to graphs widget
-
 
     #Makes popup with info
     def showInfo(self):
