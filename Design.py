@@ -161,10 +161,13 @@ class Ui_MainWindow(object):
         #update devices
         #empty devicesBox
         self.devicesBox.clear()
+        self.devicesBoxGraphs.clear()
 
         #fill devicesBox
         for device in self.devices:
-            self.devicesBox.addItem(device.getName())
+            self.devicesBox.addItem(device.name)
+            self.devicesBoxGraphs.addItem(device.name)
+
 
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
@@ -265,6 +268,12 @@ class Ui_MainWindow(object):
         goBack.setText("Ok")
         goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
         goBack.move(450,400)
+
+        self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
+        for device in self.devices:
+            self.devicesBoxGraphs.addItem(device.getName())
+        self.devicesBoxGraphs.move(450,0)
+        self.devicesBoxGraphs.activated[str].connect(self.setCurrentDevice)
 
 
         self.stackedWidget.addWidget(self.page3)
