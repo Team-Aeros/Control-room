@@ -48,5 +48,5 @@ class MainGrid():
 
         self.Rolluik1.raise_()
         self.Status1.raise_()
-        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
+        self.gridLayout_3.addWidget(self.rolluik1Widget, 0, 0, 0, 0)
 
