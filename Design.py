@@ -156,13 +156,11 @@ class Ui_MainWindow(object):
 
         #update devices
         #empty devicesBox
-        for i in range(0, len(self.devicesBox)):
-            print("rem " + self.devicesBox.itemText(i))
-            self.devicesBox.removeItem(i)
+        self.devicesBox.clear()
 
         #fill devicesBox
         for device in self.devices:
-            print("rem " + device.name)
+            print("add " + device.name)
             self.devicesBox.addItem(device.getName())
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
