@@ -22,6 +22,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
         self.devices = []
+        self.currentDevice = None
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -132,8 +133,9 @@ class Ui_MainWindow(object):
         self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
 
         #sets up maingrid and adds it to stacked widget
-        self.page_0 = QtWidgets.QWidget(MainWindow)
-        self.stackedWidget.addWidget(MainGrid(self.page_0).getPage())
+        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.mainGrid = MainGrid(self.page0)
+        self.stackedWidget.addWidget(self.mainGrid.page0)
 
         self.setupSettingsWindow()
         self.setupEnterDevice()
@@ -155,62 +157,75 @@ class Ui_MainWindow(object):
         #update devices
         #empty devicesBox
         for i in range(0, len(self.devicesBox)):
+            print("rem " + self.devicesBox.itemText(i))
             self.devicesBox.removeItem(i)
 
         #fill devicesBox
         for device in self.devices:
+            print("rem " + device.name)
             self.devicesBox.addItem(device.getName())
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
-            self.Rolluik1.setText(self.devices[0].getName())
-            self.Status1.setText(self.devices[0].getStatus())
+            self.mainGrid.Rolluik1.setText(self.devices[0].getName())
+            self.mainGrid.Status1.setText(self.devices[0].getStatus())
         #self.devicesBox.activated[str].connect(self.setCurrentDevice)
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
+        if type == "Light":
+            self.temp.setDisabled(True)
+            self.light.setDisabled(False)
+        elif type == "Temperature":
+            self.light.setDisabled(True)
+            self.temp.setDisabled(False)
+
+
         self.sensorType = type
 
     def changeMinLight(self, minLight):
         if self.checkStringForNumber(minLight):
-            minLigh = int(minLight)
-            self.currentDevice.setMinLight(minLigh)
-
+            #minLigh = int(minLight)
+            self.currentDevice.minLight = int(minLight)
+            print("Light value from " + self.currentDevice.name + " changed to " + minLight)
 
     def changeMinTemp(self, minTemp):
         if self.checkStringForNumber(minTemp):
-            minTemp = int(minTemp)
-            self.currentDevice.setMinTemp(minTemp)
+            #minTemp = int(minTemp)
+            self.currentDevice.minTemp = int(minTemp)
+            print("Temperature value from " + self.currentDevice.name + " changed to " + minTemp)
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
-        if len(string) > 1:
+        """if len(string) > 1:
             if string not in numbers:
                 return False
         else:
             chrs = list(string)
             for chr in chrs:
-                if chr not in chrs:
-                    return False
+                if chr not in numbers:
+                    return False"""
+        chrs = list(string)
+        if len([chr for chr in chrs if chr not in numbers]) > 0: return False
         return True
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
-        self.page_1 = QtWidgets.QWidget()
-        self.settingsWindowWidget = QtWidgets.QWidget(self.page_1)
+        self.page1 = QtWidgets.QWidget()
+        self.settingsWindowWidget = QtWidgets.QWidget(self.page1)
         self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,160))
         self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,160))
 
         layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
-        minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
-        minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
 
-        chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
-        chgMinLight.setText("Change the min light value")
-        chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
+        self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinLight.setText("Change the min light value")
+        self.chgMinLight.clicked.connect(lambda: self.changeMinLight(self.minLight.text()))
 
-        chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
-        chgMinTemp.setText("Change the min temp value")
-        chgMinLight.clicked.connect(lambda: self.changeMinLight(minTemp.text()))
+        self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinTemp.setText("Change the min temp value")
+        self.chgMinTemp.clicked.connect(lambda: self.changeMinTemp(self.minTemp.text()))
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
@@ -221,27 +236,28 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.getName())
         self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, minTemp)
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, chgMinTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
         layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
         layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
 
         #self.stackedWidget.insertWidget(1,self.page_1)
-        self.stackedWidget.addWidget(self.page_1)
+        self.stackedWidget.addWidget(self.page1)
 
     def setupGraphsWindow(self):
-        self.page_3 = QtWidgets.QWidget()
-        self.graphWidget = QtWidgets.QWidget(self.page_3)
+        self.page3 = QtWidgets.QWidget()
+        self.graphWidget = QtWidgets.QWidget(self.page3)
         self.graphWidget.setMinimumSize(QtCore.QSize(500, 500))
 
-        self.stackedWidget.addWidget(self.page_3)
+        self.stackedWidget.addWidget(self.page3)
 
     def setupEnterDevice(self):
-        self.page_2 = QtWidgets.QWidget()
+        self.page2 = QtWidgets.QWidget()
         self.sensorType = ""
-        self.enterDeviceWidget = QtWidgets.QWidget(self.page_2)
+
+        self.enterDeviceWidget = QtWidgets.QWidget(self.page2)
         self.enterDeviceWidget.setMinimumSize(QtCore.QSize(400, 300))
         self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 300))
 
@@ -290,10 +306,9 @@ class Ui_MainWindow(object):
         layout.addRow(sensorlabel, sensor)
         layout.addRow(addDevice, goBack)
         #self.stackedWidget.insertWidget(2,self.page_2)
-        self.stackedWidget.addWidget(self.page_2)
 
-    def addDevice(self, name, port ,sensor,  minLight, minTemp,):
-        self.devices.append(Device(name, port, sensor, minLight, minTemp))
+        self.setSensorType("Light")
+        self.stackedWidget.addWidget(self.page2)
 
     def addDeviceNoPar(self):
         nameRes = self.name.text()
@@ -303,31 +318,45 @@ class Ui_MainWindow(object):
 
         if nameRes == "":
             print("must have name")
-        else:
-            for device in self.devices:
-                if device.getName() == nameRes:
-                    error = QMessageBox()
-                    error.setIcon(QMessageBox.Critical)
-                    error.setText("Error: Duplicate names")
-                    error.setInformativeText("There is already a device with that name")
-                    error.setWindowTitle("Error")
-                    error.exec()
-                    self.name.setText("")
-                    return
+            return
 
-            new_device = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
-            self.devices.append(new_device)
-            device_added = QMessageBox()
-            device_added.setIcon(QMessageBox.Information)
-            device_added.setText("Device with name: " + nameRes + " has been added!")
-            device_added.setWindowTitle("Info")
-            device_added.setStandardButtons(QMessageBox.Cancel)
-            device_added.exec_()
+        for device in self.devices:
+            if device.getName() == nameRes:
+                error = QMessageBox()
+                error.setIcon(QMessageBox.Critical)
+                error.setText("Error: Duplicate names")
+                error.setInformativeText("There is already a device with that name")
+                error.setWindowTitle("Error")
+                error.exec()
+                self.name.setText("")
+                return None
+
+        newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
+        self.devices.append(newDevice)
+        self.currentDevice = self.devices[0]
+        device_added = QMessageBox()
+        device_added.setIcon(QMessageBox.Information)
+        device_added.setText("Device with name: " + nameRes + " has been added!")
+        device_added.setWindowTitle("Info")
+        device_added.setStandardButtons(QMessageBox.Cancel)
+        device_added.exec_()
 
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
+                if self.currentDevice.sensorType == "Light":
+                    self.minTemp.setDisabled(True)
+                    self.minLight.setDisabled(False)
+
+                    self.chgMinLight.setDisabled(False)
+                    self.chgMinTemp.setDisabled(True)
+                elif self.currentDevice.sensorType == "Temperature":
+                    self.minTemp.setDisabled(False)
+                    self.minLight.setDisabled(True)
+
+                    self.chgMinLight.setDisabled(True)
+                    self.chgMinTemp.setDisabled(False)
                 #print(type(self.currentDevice))
 
     #sets te text

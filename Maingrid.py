@@ -2,8 +2,8 @@ from PyQt5 import QtCore,  QtWidgets
 
 class MainGrid():
     def __init__(self, widget):
-        self.page_0 = widget
-        self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
+        self.page0 = widget
+        self.gridLayoutWidget = QtWidgets.QWidget(self.page0)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))  # 90, 60, 781, 501
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
@@ -50,5 +50,3 @@ class MainGrid():
         self.Status1.raise_()
         self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
 
-    def getPage(self):
-        return self.page_0
