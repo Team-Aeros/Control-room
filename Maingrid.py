@@ -11,24 +11,24 @@ class MainGrid():
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
 
-        self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
+        self.rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
                                            QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Rolluik1Widget.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.rolluik1Widget.sizePolicy().hasHeightForWidth())
 
-        self.Rolluik1Widget.setSizePolicy(sizePolicy)
-        self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
-        self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
-        self.Rolluik1Widget.setMouseTracking(False)
-        self.Rolluik1Widget.setAutoFillBackground(True)
-        self.Rolluik1Widget.setObjectName("Rolluik1Widget")
-        self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
+        self.rolluik1Widget.setSizePolicy(sizePolicy)
+        self.rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
+        self.rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
+        self.rolluik1Widget.setMouseTracking(False)
+        self.rolluik1Widget.setAutoFillBackground(True)
+        self.rolluik1Widget.setObjectName("Rolluik1Widget")
+        self.Rolluik1 = QtWidgets.QLabel(self.rolluik1Widget)
         self.Rolluik1.setGeometry(QtCore.QRect(10, 10, 47, 13))
         self.Rolluik1.setObjectName("Rolluik1")
 
-        self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
+        self.Status1 = QtWidgets.QLabel(self.rolluik1Widget)
         self.Status1.setGeometry(QtCore.QRect(150, 65, 100, 20))
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -48,5 +48,5 @@ class MainGrid():
 
         self.Rolluik1.raise_()
         self.Status1.raise_()
-        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
+        self.gridLayout_3.addWidget(self.rolluik1Widget, 0, 0, 0, 0)
 
