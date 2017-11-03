@@ -9,9 +9,10 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QMessageBox, QGroupBox, QLabel, QLineEdit
-from stringNames import *
-from Device import *
+from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
+from stringNames import stringNames
+from Device import Device
+from Maingrid import MainGrid
 
 #Main window
 class Ui_MainWindow(object):
@@ -21,6 +22,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
         self.devices = []
+        self.currentDevice = None
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -130,14 +132,18 @@ class Ui_MainWindow(object):
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
         self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
 
-        self.setupDeviceWindow()
+        #sets up maingrid and adds it to stacked widget
+        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.mainGrid = MainGrid(self.page0)
+        self.stackedWidget.addWidget(self.mainGrid.page0)
+
         self.setupSettingsWindow()
         self.setupEnterDevice()
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
         self.Manual.clicked.connect(self.toggleManual)
-        self.Graphs.clicked.connect(self.showGraphs)
+        self.Graphs.clicked.connect(lambda: self.setIndex(3))
         self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -151,118 +157,75 @@ class Ui_MainWindow(object):
         #update devices
         #empty devicesBox
         for i in range(0, len(self.devicesBox)):
+            print("rem " + self.devicesBox.itemText(i))
             self.devicesBox.removeItem(i)
 
         #fill devicesBox
         for device in self.devices:
+            print("rem " + device.name)
             self.devicesBox.addItem(device.getName())
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
-            self.Rolluik1.setText(self.devices[0].getName())
-            self.Status1.setText(self.devices[0].getStatus())
+            self.mainGrid.Rolluik1.setText(self.devices[0].getName())
+            self.mainGrid.Status1.setText(self.devices[0].getStatus())
         #self.devicesBox.activated[str].connect(self.setCurrentDevice)
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
+        if type == "Light":
+            self.temp.setDisabled(True)
+            self.light.setDisabled(False)
+        elif type == "Temperature":
+            self.light.setDisabled(True)
+            self.temp.setDisabled(False)
+
+
         self.sensorType = type
 
-    def changeMinLight(self, minLigh):
-        print(type(self.currentDevice))
-        if self.checkStringForNumber(minLigh):
-            minLigh = int(minLigh)
-            self.currentDevice.setMinLight(minLigh)
-        else:
-            print("Entered value is not a number!")
+    def changeMinLight(self, minLight):
+        if self.checkStringForNumber(minLight):
+            #minLigh = int(minLight)
+            self.currentDevice.minLight = int(minLight)
+            print("Light value from " + self.currentDevice.name + " changed to " + minLight)
 
     def changeMinTemp(self, minTemp):
         if self.checkStringForNumber(minTemp):
-            minTemp = int(minTemp)
-            self.currentDevice.setMinTemp(minTemp)
+            #minTemp = int(minTemp)
+            self.currentDevice.minTemp = int(minTemp)
+            print("Temperature value from " + self.currentDevice.name + " changed to " + minTemp)
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
-        if len(string > 1):
+        """if len(string) > 1:
             if string not in numbers:
                 return False
         else:
             chrs = list(string)
             for chr in chrs:
-                if chr not in chrs:
-                    return False
+                if chr not in numbers:
+                    return False"""
+        chrs = list(string)
+        if len([chr for chr in chrs if chr not in numbers]) > 0: return False
         return True
-
-
-    #sets up the ui in which you can see the devices
-    def setupDeviceWindow(self):
-        self.page_0 = QtWidgets.QWidget(MainWindow)
-        self.gridLayoutWidget = QtWidgets.QWidget(self.page_0)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(90, 60, 781, 501))  # 90, 60, 781, 501
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
-        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-
-        self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
-                                           QtWidgets.QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Rolluik1Widget.sizePolicy().hasHeightForWidth())
-
-        self.Rolluik1Widget.setSizePolicy(sizePolicy)
-        self.Rolluik1Widget.setMinimumSize(QtCore.QSize(200, 80))
-        self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
-        self.Rolluik1Widget.setMouseTracking(False)
-        self.Rolluik1Widget.setAutoFillBackground(True)
-        self.Rolluik1Widget.setObjectName("Rolluik1Widget")
-        self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Rolluik1.setGeometry(QtCore.QRect(10, 10, 47, 13))
-        self.Rolluik1.setObjectName("Rolluik1")
-
-        self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
-        self.Status1.setGeometry(QtCore.QRect(150, 65, 100, 20))
-
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.Status1.sizePolicy().hasHeightForWidth())
-
-        self.Status1.setSizePolicy(sizePolicy)
-        self.Status1.setAcceptDrops(False)
-        self.Status1.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.Status1.setAutoFillBackground(True)
-        self.Status1.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.Status1.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.Status1.setTextFormat(QtCore.Qt.PlainText)
-        self.Status1.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.Status1.setObjectName("Status1")
-
-        self.Rolluik1.raise_()
-        self.Status1.raise_()
-        self.gridLayout_3.addWidget(self.Rolluik1Widget, 0, 0, 0, 0)
-
-        #self.stackedWidget.insertWidget(0,self.page_0)
-        self.stackedWidget.addWidget(self.page_0)
-        #self.stackedWidget.setCurrentIndex(0)
 
     #sets up settingswidget that shows the settings
     def setupSettingsWindow(self):
-        self.page_1 = QtWidgets.QWidget()
-        self.settingsWindowWidget = QtWidgets.QWidget(self.page_1)
+        self.page1 = QtWidgets.QWidget()
+        self.settingsWindowWidget = QtWidgets.QWidget(self.page1)
         self.settingsWindowWidget.setMinimumSize(QtCore.QSize(400,160))
         self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,160))
 
         layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
-        minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
-        minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
 
-        chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
-        chgMinLight.setText("Change the min light value")
-        chgMinLight.clicked.connect(lambda: self.changeMinLight(minLight.text()))
+        self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinLight.setText("Change the min light value")
+        self.chgMinLight.clicked.connect(lambda: self.changeMinLight(self.minLight.text()))
 
-        chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
-        chgMinTemp.setText("Change the min temp value")
+        self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
+        self.chgMinTemp.setText("Change the min temp value")
+        self.chgMinTemp.clicked.connect(lambda: self.changeMinTemp(self.minTemp.text()))
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
@@ -273,29 +236,37 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.getName())
         self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, minTemp)
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, chgMinTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
+        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
         layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
         layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
 
         #self.stackedWidget.insertWidget(1,self.page_1)
-        self.stackedWidget.addWidget(self.page_1)
+        self.stackedWidget.addWidget(self.page1)
+
+    def setupGraphsWindow(self):
+        self.page3 = QtWidgets.QWidget()
+        self.graphWidget = QtWidgets.QWidget(self.page3)
+        self.graphWidget.setMinimumSize(QtCore.QSize(500, 500))
+
+        self.stackedWidget.addWidget(self.page3)
 
     def setupEnterDevice(self):
-        self.page_2 = QtWidgets.QWidget()
+        self.page2 = QtWidgets.QWidget()
         self.sensorType = ""
-        self.enterDeviceWidget = QtWidgets.QWidget(self.page_2)
+
+        self.enterDeviceWidget = QtWidgets.QWidget(self.page2)
         self.enterDeviceWidget.setMinimumSize(QtCore.QSize(400, 300))
         self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 300))
 
         layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
-        namelabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("name")
-        lightlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min light")
-        templabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Min temp")
-        portlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Port number")
-        sensorlabel = QtWidgets.QLabel(self.enterDeviceWidget).setText("Sensor type")
+        namelabel = QLabel("name")
+        lightlabel = QLabel("Min light")
+        templabel = QLabel("Min temp")
+        portlabel = QLabel("Port number")
+        sensorlabel = QLabel("Sensor type")
 
         self.name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
         self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
@@ -328,20 +299,6 @@ class Ui_MainWindow(object):
         goBack.setMaximumSize(QtCore.QSize(100,200))
         goBack.clicked.connect(lambda: self.setIndex(0))
 
-        """layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, namelabel)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, lightlabel)
-        layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, templabel)
-        layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, portlabel)
-        layout.setWidget(4, QtWidgets.QFormLayout.LabelRole, sensorlabel)
-        layout.setWidget(5, QtWidgets.QFormLayout.LabelRole, addDevice)
-
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, name)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, light)
-        layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, temp)
-        layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, port)
-        layout.setWidget(4, QtWidgets.QFormLayout.FieldRole, sensor)
-        layout.setWidget(5, QtWidgets.QFormLayout.FieldRole, goBack)"""
-
         layout.addRow(namelabel, self.name)
         layout.addRow(lightlabel, self.light)
         layout.addRow(templabel, self.temp)
@@ -349,33 +306,58 @@ class Ui_MainWindow(object):
         layout.addRow(sensorlabel, sensor)
         layout.addRow(addDevice, goBack)
         #self.stackedWidget.insertWidget(2,self.page_2)
-        self.stackedWidget.addWidget(self.page_2)
 
-    def addDevice(self, name, port ,sensor,  minLight, minTemp,):
-        self.devices.append(Device(name, port, sensor, minLight, minTemp))
+        self.setSensorType("Light")
+        self.stackedWidget.addWidget(self.page2)
 
     def addDeviceNoPar(self):
         nameRes = self.name.text()
         portRes = self.port.text()
         lightRes = int(self.light.text())
         tempRes = int(self.temp.text())
-        if nameRes != "":
-            new_device = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
-            self.devices.append(new_device)
 
-            device_added = QMessageBox()
-            device_added.setIcon(QMessageBox.Information)
-            device_added.setText("Device with name: " + nameRes + " has been added!")
-            device_added.setWindowTitle("Info")
-            device_added.setStandardButtons(QMessageBox.Cancel)
-            device_added.exec_()
-        else:
+        if nameRes == "":
             print("must have name")
+            return
+
+        for device in self.devices:
+            if device.getName() == nameRes:
+                error = QMessageBox()
+                error.setIcon(QMessageBox.Critical)
+                error.setText("Error: Duplicate names")
+                error.setInformativeText("There is already a device with that name")
+                error.setWindowTitle("Error")
+                error.exec()
+                self.name.setText("")
+                return None
+
+        newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
+        self.devices.append(newDevice)
+        self.currentDevice = self.devices[0]
+        device_added = QMessageBox()
+        device_added.setIcon(QMessageBox.Information)
+        device_added.setText("Device with name: " + nameRes + " has been added!")
+        device_added.setWindowTitle("Info")
+        device_added.setStandardButtons(QMessageBox.Cancel)
+        device_added.exec_()
 
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.getName() == name:
                 self.currentDevice = device
+                if self.currentDevice.sensorType == "Light":
+                    self.minTemp.setDisabled(True)
+                    self.minLight.setDisabled(False)
+
+                    self.chgMinLight.setDisabled(False)
+                    self.chgMinTemp.setDisabled(True)
+                elif self.currentDevice.sensorType == "Temperature":
+                    self.minTemp.setDisabled(False)
+                    self.minLight.setDisabled(True)
+
+                    self.chgMinLight.setDisabled(True)
+                    self.chgMinTemp.setDisabled(False)
+                #print(type(self.currentDevice))
 
     #sets te text
     def retranslateUi(self, MainWindow):
@@ -409,10 +391,6 @@ class Ui_MainWindow(object):
 
         except:
             pass
-
-    #changes the central widget to graphs widget
-    def showGraphs(self):
-        print("Shows 2 graphs, temp and light")
 
     #Makes popup with info
     def showInfo(self):
