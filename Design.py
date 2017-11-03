@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
 from stringNames import stringNames
 from Device import Device
 from Maingrid import MainGrid
+from PlotCanvas import PlotCanvas
+import random
 
 #Main window
 class Ui_MainWindow(object):
@@ -130,7 +132,8 @@ class Ui_MainWindow(object):
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
-        self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
+        self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
+        self.stackedWidget.move(100,100)
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -139,6 +142,7 @@ class Ui_MainWindow(object):
 
         self.setupSettingsWindow()
         self.setupEnterDevice()
+        self.setupGraphsWindow()
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
@@ -161,11 +165,18 @@ class Ui_MainWindow(object):
         #fill devicesBox
         for device in self.devices:
             self.devicesBox.addItem(device.getName())
+
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].getName())
             self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #self.devicesBox.activated[str].connect(self.setCurrentDevice)
+
+        #fill graph
+        if index == 3:
+            data = [random.uniform(0.0, 100.0) for i in range(25)]
+
+            self.canvas.plot(data)
+
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -246,7 +257,15 @@ class Ui_MainWindow(object):
     def setupGraphsWindow(self):
         self.page3 = QtWidgets.QWidget()
         self.graphWidget = QtWidgets.QWidget(self.page3)
-        self.graphWidget.setMinimumSize(QtCore.QSize(500, 500))
+        self.graphWidget.setGeometry(QtCore.QRect(50, 50, 400, 500))
+        self.graphWidget.setMinimumSize(QtCore.QSize(600,600))
+        self.canvas = PlotCanvas(self.graphWidget)
+
+        goBack = QtWidgets.QPushButton(self.graphWidget)
+        goBack.setText("Ok")
+        goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        goBack.move(450,400)
+
 
         self.stackedWidget.addWidget(self.page3)
 
