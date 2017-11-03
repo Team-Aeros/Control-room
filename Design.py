@@ -160,7 +160,6 @@ class Ui_MainWindow(object):
 
         #fill devicesBox
         for device in self.devices:
-            print("add " + device.name)
             self.devicesBox.addItem(device.getName())
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
@@ -331,7 +330,7 @@ class Ui_MainWindow(object):
 
         newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
         self.devices.append(newDevice)
-        self.currentDevice = self.devices[0]
+        self.setCurrentDevice(self.devices[0].name)
         device_added = QMessageBox()
         device_added.setIcon(QMessageBox.Information)
         device_added.setText("Device with name: " + nameRes + " has been added!")
