@@ -13,12 +13,6 @@ class Device():
         self.portNumber = portNumber
         self.sensorType = sensorType
 
-    """def setMinLight(self, val):
-        self.min_light = val
-
-    def setMinTemp(self, val):
-        self.min_temp = val"""
-
     def getName(self):
         return self.name
 

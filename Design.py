@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
 from stringNames import stringNames
 from Device import Device
 from Maingrid import MainGrid
+from PlotCanvas import PlotCanvas
+import random
 
 #Main window
 class Ui_MainWindow(object):
@@ -130,7 +132,8 @@ class Ui_MainWindow(object):
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
-        self.stackedWidget.setMinimumSize(QtCore.QSize(400, 400))
+        self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
+        self.stackedWidget.move(100,100)
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -139,6 +142,7 @@ class Ui_MainWindow(object):
 
         self.setupSettingsWindow()
         self.setupEnterDevice()
+        self.setupGraphsWindow()
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
@@ -156,19 +160,19 @@ class Ui_MainWindow(object):
 
         #update devices
         #empty devicesBox
-        for i in range(0, len(self.devicesBox)):
-            print("rem " + self.devicesBox.itemText(i))
-            self.devicesBox.removeItem(i)
+        self.devicesBox.clear()
+        self.devicesBoxGraphs.clear()
 
         #fill devicesBox
         for device in self.devices:
-            print("rem " + device.name)
-            self.devicesBox.addItem(device.getName())
+            self.devicesBox.addItem(device.name)
+            self.devicesBoxGraphs.addItem(device.name)
+
+
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
-            self.mainGrid.Rolluik1.setText(self.devices[0].getName())
+            self.mainGrid.Rolluik1.setText(self.devices[0].name)
             self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #self.devicesBox.activated[str].connect(self.setCurrentDevice)
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -233,7 +237,7 @@ class Ui_MainWindow(object):
 
         self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
         for device in self.devices:
-            self.devicesBox.addItem(device.getName())
+            self.devicesBox.addItem(device.name)
         self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
         layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
@@ -249,9 +253,36 @@ class Ui_MainWindow(object):
     def setupGraphsWindow(self):
         self.page3 = QtWidgets.QWidget()
         self.graphWidget = QtWidgets.QWidget(self.page3)
-        self.graphWidget.setMinimumSize(QtCore.QSize(500, 500))
+        self.graphWidget.setGeometry(QtCore.QRect(50, 50, 400, 500))
+        self.graphWidget.setMinimumSize(QtCore.QSize(600,600))
+        self.canvas = PlotCanvas(self.graphWidget)
+
+        goBack = QtWidgets.QPushButton(self.graphWidget)
+        goBack.setText("Ok")
+        goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+        goBack.move(450,400)
+
+        start = QtWidgets.QPushButton(self.graphWidget)
+        start.setText("start")
+        start.clicked.connect(self.fillGraph)
+        start.move(450,375)
+
+        self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
+        for device in self.devices:
+            self.devicesBoxGraphs.addItem(device.name)
+        self.devicesBoxGraphs.move(450,0)
+        self.devicesBoxGraphs.activated[str].connect(self.setCurrentDevice)
+
 
         self.stackedWidget.addWidget(self.page3)
+
+    def fillGraph(self):
+        # fill graph
+        data = [random.uniform(0.0, 100.0) for i in range(25)] #testdata
+        try:
+            self.canvas.plot(data, self.currentDevice.sensorType)
+        except:
+            self.showError("Error: No device attached", "There is no device connected, add a device first!")
 
     def setupEnterDevice(self):
         self.page2 = QtWidgets.QWidget()
@@ -321,19 +352,14 @@ class Ui_MainWindow(object):
             return
 
         for device in self.devices:
-            if device.getName() == nameRes:
-                error = QMessageBox()
-                error.setIcon(QMessageBox.Critical)
-                error.setText("Error: Duplicate names")
-                error.setInformativeText("There is already a device with that name")
-                error.setWindowTitle("Error")
-                error.exec()
+            if device.name == nameRes:
+                self.showError("Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return None
 
         newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
         self.devices.append(newDevice)
-        self.currentDevice = self.devices[0]
+        self.setCurrentDevice(self.devices[0].name)
         device_added = QMessageBox()
         device_added.setIcon(QMessageBox.Information)
         device_added.setText("Device with name: " + nameRes + " has been added!")
@@ -341,9 +367,17 @@ class Ui_MainWindow(object):
         device_added.setStandardButtons(QMessageBox.Cancel)
         device_added.exec_()
 
+    def showError(self, errorText, errorIText):
+        error = QMessageBox()
+        error.setIcon(QMessageBox.Critical)
+        error.setText(errorText)
+        error.setInformativeText(errorIText)
+        error.setWindowTitle("Error")
+        error.exec()
+
     def setCurrentDevice(self, name):
         for device in self.devices:
-            if device.getName() == name:
+            if device.name == name:
                 self.currentDevice = device
                 if self.currentDevice.sensorType == "Light":
                     self.minTemp.setDisabled(True)
