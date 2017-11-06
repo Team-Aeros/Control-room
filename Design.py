@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(9, 9, 81, 551))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 80, 590))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -65,7 +65,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addItem(spacerItem2)
 
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 52))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 810, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -131,9 +131,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
-        self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
-        self.stackedWidget.move(100,100)
+        self.stackedWidget.setGeometry(QtCore.QRect(100, 60, 800, 540))
+        #self.stackedWidget.setMaximumWidth(800)
+        #self.stackedWidget.setMaximumHeight(540)
+        self.stackedWidget.setFixedSize(800, 540)
+        self.stackedWidget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        #self.stackedWidget.setStyleSheet("background-color: black")
+
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -233,6 +237,7 @@ class Ui_MainWindow(object):
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
+        #goBack.clicked.connect(lambda: self.updateMaingrid())
         goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
         self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
@@ -443,6 +448,10 @@ class Ui_MainWindow(object):
         info.setWindowTitle("Info")
         info.setStandardButtons(QMessageBox.Cancel)
         info.exec_()
+
+    def updateMaingrid(self):
+        MainGrid.setDevices(self.devices)
+
 
 if __name__ == "__main__":
     import sys
