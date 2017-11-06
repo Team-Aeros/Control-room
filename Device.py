@@ -1,4 +1,3 @@
-
 class Device():
     def __init__(self,
                       name,
@@ -26,7 +25,3 @@ class Device():
 
     def changeStatus(self, status):
         self.status = status
-
-
-
-
