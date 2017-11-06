@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].name)
-            self.mainGrid.Status1.setText(self.devices[0].getStatus())
+            self.mainGrid.Status1.setText(self.devices[0].get_status())
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -356,16 +356,20 @@ class Ui_MainWindow(object):
                 self.showError("Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return None
-
-        newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
-        self.devices.append(newDevice)
-        self.setCurrentDevice(self.devices[0].name)
-        device_added = QMessageBox()
-        device_added.setIcon(QMessageBox.Information)
-        device_added.setText("Device with name: " + nameRes + " has been added!")
-        device_added.setWindowTitle("Info")
-        device_added.setStandardButtons(QMessageBox.Cancel)
-        device_added.exec_()
+        try:
+            newDevice = Device(nameRes, portRes, self.sensorType)
+            self.devices.append(newDevice)
+            self.setCurrentDevice(self.devices[0].name)
+            device_added = QMessageBox()
+            device_added.setIcon(QMessageBox.Information)
+            device_added.setText("Device with name: " + nameRes + " has been added!")
+            device_added.setWindowTitle("Info")
+            device_added.setStandardButtons(QMessageBox.Cancel)
+            device_added.exec_()
+        except:
+            self.showError("Error: No device connected to " + portRes, "Cant open serial connection")
+            
+        
 
     def showError(self, errorText, errorIText):
         error = QMessageBox()
