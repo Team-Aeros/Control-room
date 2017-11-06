@@ -27,7 +27,3 @@ class Device():
 
     def changeStatus(self, status):
         self.status = status
-
-
-
-
