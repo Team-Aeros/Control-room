@@ -143,10 +143,12 @@ class Ui_MainWindow(object):
         self.setupSettingsWindow()
         self.setupEnterDevice()
         self.setupGraphsWindow()
+        self.setupManual()
+
         self.stackedWidget.setCurrentIndex(0)
 
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
-        self.Manual.clicked.connect(self.toggleManual)
+        self.Manual.clicked.connect(lambda: self.setIndex(4))
         self.Graphs.clicked.connect(lambda: self.setIndex(3))
         self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
@@ -162,11 +164,13 @@ class Ui_MainWindow(object):
         #empty devicesBox
         self.devicesBox.clear()
         self.devicesBoxGraphs.clear()
+        self.devicesBoxManual.clear()
 
         #fill devicesBox
         for device in self.devices:
             self.devicesBox.addItem(device.name)
             self.devicesBoxGraphs.addItem(device.name)
+            self.devicesBoxManual.addItem(device.name)
 
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
@@ -202,6 +206,9 @@ class Ui_MainWindow(object):
             print("Minimum value from " + self.currentDevice.name + " changed to " + minVal)
         else:
             self.showError("Not a number", "You have to enter a valid number!")
+        #easter egg
+        if minVal == "aeros development":
+            self.showError("Yes thats us!", "But seriously you need to enter a number")
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
@@ -356,6 +363,50 @@ class Ui_MainWindow(object):
         self.setSensorType("Light")
         self.stackedWidget.addWidget(self.page2)
 
+        # makes inputdialog in which you can enter a percentage
+
+    def setupManual(self):
+        """
+        print("Popup that allows to roll out shutter")
+        try:
+            s = stringNames()
+            s.setManualText("Give percentage", "percentage: ")
+            string = s.getManualText()
+            title_text = string.split(";")
+            title = title_text[0]
+            text = title_text[1]
+            res, popup = QInputDialog(MainWindow).getInt(MainWindow, title, text ,0 , 0, 100, 1) #res is input result
+            popup.exec()
+        except:
+            pass"""
+        self.page4 = QtWidgets.QWidget()
+        self.manualWidget = QtWidgets.QWidget(self.page4)
+        layout = QtWidgets.QFormLayout(self.manualWidget)
+
+        percentageLabel = QLabel("Give percentage")
+        percentage = QtWidgets.QLineEdit(self.manualWidget)
+        percentage.setText("0")
+
+        self.devicesBoxManual = QtWidgets.QComboBox(self.manualWidget)
+        for device in self.devices:
+            self.devicesBoxManual.addItem(device.name)
+        self.devicesBoxManual.activated[str].connect(self.setCurrentDevice)
+
+        ok = QtWidgets.QPushButton(self.manualWidget)
+        ok.setText("Ok")
+        ok.setMaximumSize(QtCore.QSize(100, 200))
+        ok.clicked.connect(lambda: self.setIndex(0))
+        ok.clicked.connect(lambda: self.rollOut(0))
+
+        layout.addRow(percentageLabel, percentage)
+        layout.addRow(self.devicesBoxManual, ok)
+
+        self.manualWidget.setLayout(layout)
+        self.stackedWidget.addWidget(self.page4)
+
+    def rollOut(self, int):
+        print("Placeholder function to roll out the shutter " + str(int))
+
     def addDeviceNoPar(self):
         nameRes = self.name.text()
         portRes = self.port.text()
@@ -436,22 +487,6 @@ class Ui_MainWindow(object):
         #self.Rolluik1.setText(_translate("MainWindow", self.devices[0].getName()))
         #self.Status1.setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))
 
-    #makes inputdialog in which you can enter a percentage
-    def toggleManual(self):
-        print("Popup that allows to roll out shutter")
-        try:
-            s = stringNames()
-            s.setManualText("Give percentage", "percentage: ")
-            string = s.getManualText()
-            title_text = string.split(";")
-            title = title_text[0]
-            text = title_text[1]
-
-            res, popup = QInputDialog(MainWindow).getInt(MainWindow, title, text ,0 , 0, 100, 1) #res is input result
-            popup.exec()
-
-        except:
-            pass
 
     #Makes popup with info
     def showInfo(self):
