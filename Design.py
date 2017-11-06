@@ -212,14 +212,6 @@ class Ui_MainWindow(object):
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
-        """if len(string) > 1:
-            if string not in numbers:
-                return False
-        else:
-            chrs = list(string)
-            for chr in chrs:
-                if chr not in numbers:
-                    return False"""
         chrs = list(string)
         if len([chr for chr in chrs if chr not in numbers]) > 0: return False
         return True
@@ -314,6 +306,7 @@ class Ui_MainWindow(object):
         #lightlabel = QLabel("Min light")
         #templabel = QLabel("Min temp")
         valuelabel = QLabel("Minimum value")
+        maxRollLengthLabel = QLabel("Max roll out length in meters")
         portlabel = QLabel("Port number")
         sensorlabel = QLabel("Sensor type")
 
@@ -322,10 +315,12 @@ class Ui_MainWindow(object):
         #self.temp = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
         self.port = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("COM0")
         self.value = QtWidgets.QLineEdit(self.enterDeviceWidget)
+        self.maxRollLength = QtWidgets.QLineEdit(self.enterDeviceWidget)
 
         self.name.setText("")
         #self.light.setText("0")
         #self.temp.setText("0")
+        self.maxRollLength.setText("0")
         self.value.setText("0")
         self.port.setText("COM0")
 
@@ -333,6 +328,7 @@ class Ui_MainWindow(object):
         #self.light.setMaximumSize(QtCore.QSize(100,200))
         #self.temp.setMaximumSize(QtCore.QSize(100,200))
         self.value.setMaximumSize(QtCore.QSize(100,200))
+        self.maxRollLength.setMaximumSize(QtCore.QSize(100,200))
         self.port.setMaximumSize(QtCore.QSize(100,200))
 
         sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
@@ -355,6 +351,7 @@ class Ui_MainWindow(object):
         #layout.addRow(lightlabel, self.light)
         #layout.addRow(templabel, self.temp)
         layout.addRow(valuelabel,self.value)
+        layout.addRow(maxRollLengthLabel, self.maxRollLength)
         layout.addRow(portlabel, self.port)
         layout.addRow(sensorlabel, sensor)
         layout.addRow(addDevice, goBack)
@@ -418,12 +415,19 @@ class Ui_MainWindow(object):
             self.showError("Not a number", "You have to enter a valid number")
             self.value.setText("0")
             return
+        try:
+            maxRollRes = float(self.maxRollLength.text())
+        except:
+            self.showError("Not a number", "You have to enter a valid number")
+            self.value.setText("0")
+            return
 
         self.name.setText("")
         self.port.setText("COM0")
         #self.light.setText("0")
         #self.temp.setText("0")
         self.value.setText("0")
+        self.maxRollLength.setText("0")
 
         if nameRes == "":
             print("must have name")
@@ -435,7 +439,7 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return None
 
-        newDevice = Device(nameRes, portRes, self.sensorType, valRes)#lightRes, tempRes)
+        newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
         device_added = QMessageBox()

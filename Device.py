@@ -1,10 +1,10 @@
-
 class Device():
     def __init__(self,
                       name,
                       portNumber,
                       sensorType,
-                      minVal):
+                      minVal,
+                      maxRollLength):
                       #min_light=0,
                       #min_temp=0):
         self.name = name            #string
@@ -12,6 +12,7 @@ class Device():
         #self.minLight = min_light
         #self.minTemp = min_temp
         self.minVal = minVal
+        self.maxRollLength = maxRollLength
         self.portNumber = portNumber
         self.sensorType = sensorType
 
