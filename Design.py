@@ -176,17 +176,16 @@ class Ui_MainWindow(object):
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
-        if type == "Light":
+        """if type == "Light":
             self.temp.setDisabled(True)
             self.light.setDisabled(False)
         elif type == "Temperature":
             self.light.setDisabled(True)
-            self.temp.setDisabled(False)
-
+            self.temp.setDisabled(False)"""
 
         self.sensorType = type
 
-    def changeMinLight(self, minLight):
+    """def changeMinLight(self, minLight):
         if self.checkStringForNumber(minLight):
             #minLigh = int(minLight)
             self.currentDevice.minLight = int(minLight)
@@ -196,7 +195,11 @@ class Ui_MainWindow(object):
         if self.checkStringForNumber(minTemp):
             #minTemp = int(minTemp)
             self.currentDevice.minTemp = int(minTemp)
-            print("Temperature value from " + self.currentDevice.name + " changed to " + minTemp)
+            print("Temperature value from " + self.currentDevice.name + " changed to " + minTemp)"""
+    def changeMinVal(self, minVal):
+        if self.checkStringForNumber(minVal):
+            self.currentDevice.minVal = int(minVal)
+            print("Minimum value from " + self.currentDevice.name + " changed to " + minVal)
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
@@ -220,16 +223,21 @@ class Ui_MainWindow(object):
         self.settingsWindowWidget.setMaximumSize(QtCore.QSize(400,160))
 
         layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
-        self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
-        self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        #self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        #self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
 
-        self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
+        """self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         self.chgMinLight.setText("Change the min light value")
         self.chgMinLight.clicked.connect(lambda: self.changeMinLight(self.minLight.text()))
 
         self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
         self.chgMinTemp.setText("Change the min temp value")
-        self.chgMinTemp.clicked.connect(lambda: self.changeMinTemp(self.minTemp.text()))
+        self.chgMinTemp.clicked.connect(lambda: self.changeMinTemp(self.minTemp.text()))"""
+
+        chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
+        chgMinVal.setText("Change the minimum value")
+        chgMinVal.clicked.connect(lambda : self.changeMinVal(minVal.text()))
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
@@ -240,10 +248,10 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.name)
         self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
-        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinLight)
-        layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minVal)
+        #layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
+        layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinVal)
+        #layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
         layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
         layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
 
@@ -294,24 +302,28 @@ class Ui_MainWindow(object):
 
         layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
         namelabel = QLabel("name")
-        lightlabel = QLabel("Min light")
-        templabel = QLabel("Min temp")
+        #lightlabel = QLabel("Min light")
+        #templabel = QLabel("Min temp")
+        valuelabel = QLabel("Minimum value")
         portlabel = QLabel("Port number")
         sensorlabel = QLabel("Sensor type")
 
         self.name = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("")
-        self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
-        self.temp = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
+        #self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
+        #self.temp = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
         self.port = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("COM0")
+        self.value = QtWidgets.QLineEdit(self.enterDeviceWidget)
 
         self.name.setText("")
-        self.light.setText("0")
-        self.temp.setText("0")
+        #self.light.setText("0")
+        #self.temp.setText("0")
+        self.value.setText("")
         self.port.setText("COM0")
 
         self.name.setMaximumSize(QtCore.QSize(100,200))
-        self.light.setMaximumSize(QtCore.QSize(100,200))
-        self.temp.setMaximumSize(QtCore.QSize(100,200))
+        #self.light.setMaximumSize(QtCore.QSize(100,200))
+        #self.temp.setMaximumSize(QtCore.QSize(100,200))
+        self.value.setMaximumSize(QtCore.QSize(100,200))
         self.port.setMaximumSize(QtCore.QSize(100,200))
 
         sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
@@ -331,8 +343,9 @@ class Ui_MainWindow(object):
         goBack.clicked.connect(lambda: self.setIndex(0))
 
         layout.addRow(namelabel, self.name)
-        layout.addRow(lightlabel, self.light)
-        layout.addRow(templabel, self.temp)
+        #layout.addRow(lightlabel, self.light)
+        #layout.addRow(templabel, self.temp)
+        layout.addRow(valuelabel,self.value)
         layout.addRow(portlabel, self.port)
         layout.addRow(sensorlabel, sensor)
         layout.addRow(addDevice, goBack)
@@ -344,8 +357,15 @@ class Ui_MainWindow(object):
     def addDeviceNoPar(self):
         nameRes = self.name.text()
         portRes = self.port.text()
-        lightRes = int(self.light.text())
-        tempRes = int(self.temp.text())
+        #lightRes = int(self.light.text())
+        #tempRes = int(self.temp.text())
+        valRes = int(self.value.text())
+
+        self.name.setText("")
+        self.port.setText("COM0")
+        #self.light.setText("0")
+        #self.temp.setText("0")
+        self.value.setText("0")
 
         if nameRes == "":
             print("must have name")
@@ -357,7 +377,7 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return None
 
-        newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
+        newDevice = Device(nameRes, portRes, self.sensorType, valRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
         device_added = QMessageBox()
@@ -379,7 +399,7 @@ class Ui_MainWindow(object):
         for device in self.devices:
             if device.name == name:
                 self.currentDevice = device
-                if self.currentDevice.sensorType == "Light":
+                """if self.currentDevice.sensorType == "Light":
                     self.minTemp.setDisabled(True)
                     self.minLight.setDisabled(False)
 
@@ -390,7 +410,7 @@ class Ui_MainWindow(object):
                     self.minLight.setDisabled(True)
 
                     self.chgMinLight.setDisabled(True)
-                    self.chgMinTemp.setDisabled(False)
+                    self.chgMinTemp.setDisabled(False)"""
                 #print(type(self.currentDevice))
 
     #sets te text

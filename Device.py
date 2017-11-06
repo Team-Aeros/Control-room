@@ -4,12 +4,14 @@ class Device():
                       name,
                       portNumber,
                       sensorType,
-                      min_light=0,
-                      min_temp=0):
+                      minVal):
+                      #min_light=0,
+                      #min_temp=0):
         self.name = name            #string
         self.status = False        #bool
-        self.minLight = min_light
-        self.minTemp = min_temp
+        #self.minLight = min_light
+        #self.minTemp = min_temp
+        self.minVal = minVal
         self.portNumber = portNumber
         self.sensorType = sensorType
 
@@ -23,7 +25,7 @@ class Device():
             return "Uitgerold"
 
     def changeStatus(self, status):
-        self.status
+        self.status = status
 
 
 
