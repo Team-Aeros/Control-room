@@ -168,11 +168,11 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.name)
             self.devicesBoxGraphs.addItem(device.name)
 
-
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].name)
             self.mainGrid.Status1.setText(self.devices[0].getStatus())
+            self.minVal.setText(str(self.currentDevice.minVal))
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -225,7 +225,8 @@ class Ui_MainWindow(object):
         layout = QtWidgets.QFormLayout(self.settingsWindowWidget)
         #self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
         #self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
-        minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
+        self.minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
+
 
         """self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
         self.chgMinLight.setText("Change the min light value")
@@ -237,7 +238,7 @@ class Ui_MainWindow(object):
 
         chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
         chgMinVal.setText("Change the minimum value")
-        chgMinVal.clicked.connect(lambda : self.changeMinVal(minVal.text()))
+        chgMinVal.clicked.connect(lambda : self.changeMinVal(self.minVal.text()))
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
@@ -248,7 +249,7 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.name)
         self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
-        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, minVal)
+        layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minVal)
         #layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
         layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinVal)
         #layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
@@ -280,7 +281,6 @@ class Ui_MainWindow(object):
             self.devicesBoxGraphs.addItem(device.name)
         self.devicesBoxGraphs.move(450,0)
         self.devicesBoxGraphs.activated[str].connect(self.setCurrentDevice)
-
 
         self.stackedWidget.addWidget(self.page3)
 
@@ -317,7 +317,7 @@ class Ui_MainWindow(object):
         self.name.setText("")
         #self.light.setText("0")
         #self.temp.setText("0")
-        self.value.setText("")
+        self.value.setText("0")
         self.port.setText("COM0")
 
         self.name.setMaximumSize(QtCore.QSize(100,200))
