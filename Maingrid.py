@@ -2,53 +2,62 @@ from PyQt5 import QtCore,  QtWidgets
 
 class MainGrid():
     def __init__(self, widget):
+        y = 0
+        x = -1
+        self.dictWidgets = {}
+        self.rolluikWidget = {}
+        self.rolluik = {}
+        self.status = {}
+        self.devices = []
+
         self.page0 = widget
         self.gridLayoutWidget = QtWidgets.QWidget(self.page0)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 800, 540))  # 90, 60, 781, 501
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 800, 540))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        #self.gridLayoutWidget.setStyleSheet("background-color = yellow")
         self.gridLayoutWidget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.gridLayout_3 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        #self.gridLayout_3.setSizeConstraint(QtWidgets.QLayout.SetMinAndMaxSize)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.gridLayout_3.setGeometry(QtCore.QRect(0, 0, 800, 540))
-        y = 0
-        x = 0
 
-        for w in range(0, 4):
-            self.Rolluik1Widget = QtWidgets.QWidget(self.gridLayoutWidget)
+        for WidgetLong in self.devices:
+            Widget = WidgetLong.name
+            self.dictWidgets[Widget] = self.rolluikWidget
+
+            self.rolluikWidget[Widget] = QtWidgets.QWidget(self.gridLayoutWidget)
             sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,
                                                QtWidgets.QSizePolicy.Maximum)
 
-            self.Rolluik1Widget.setSizePolicy(sizePolicy)
-            self.Rolluik1Widget.setMinimumSize(QtCore.QSize(400, 150))
-            self.Rolluik1Widget.setMaximumSize(QtCore.QSize(400, 150))
-            self.Rolluik1Widget.setAutoFillBackground(True)
-            self.Rolluik1Widget.setObjectName("Rolluik " + str(w) + "Widget")
-            self.Rolluik1 = QtWidgets.QLabel(self.Rolluik1Widget)
-            self.Rolluik1.setGeometry(QtCore.QRect(0, 0, 400, 300))
-            self.Rolluik1.setObjectName("Rolluik" + str(w))
-            self.Rolluik1Widget.setStyleSheet("background-color: red")
+            self.rolluikWidget[Widget].setSizePolicy(sizePolicy)
+            self.rolluikWidget[Widget].setMinimumSize(QtCore.QSize(400, 150))
+            self.rolluikWidget[Widget].setMaximumSize(QtCore.QSize(400, 150))
+            self.rolluikWidget[Widget].setAutoFillBackground(True)
+            self.rolluikWidget[Widget].setObjectName("Rolluik " + str(Widget) + "Widget")
+            self.rolluik[Widget] = QtWidgets.QLabel(self.rolluikWidget[Widget])
+            self.rolluik[Widget].setGeometry(QtCore.QRect(0, 0, 400, 300))
+            self.rolluik[Widget].setObjectName("Rolluik" + str(Widget))
+            self.rolluikWidget[Widget].setStyleSheet("background-color: red")
 
-            self.Status1 = QtWidgets.QLabel(self.Rolluik1Widget)
-            self.Status1.setFixedSize(100, 20)
-            self.Status1.setAlignment(QtCore.Qt.AlignRight)
-            self.Status1.setAutoFillBackground(True)
-            self.Status1.setFrameShape(QtWidgets.QFrame.StyledPanel)
-            self.Status1.setFrameShadow(QtWidgets.QFrame.Plain)
-            self.Status1.setTextFormat(QtCore.Qt.PlainText)
-            self.Status1.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignCenter)
-            self.Status1.setObjectName("Status" + str(w))
-            #self.Status1.setStyleSheet("background-color = white")
+            self.status[widget] = QtWidgets.QLabel(self.rolluikWidget[Widget])
+            self.status[widget].setFixedSize(100, 20)
+            self.status[widget].setAlignment(QtCore.Qt.AlignRight)
+            self.status[widget].setAutoFillBackground(True)
+            self.status[widget].setFrameShape(QtWidgets.QFrame.StyledPanel)
+            self.status[widget].setFrameShadow(QtWidgets.QFrame.Plain)
+            self.status[widget].setTextFormat(QtCore.Qt.PlainText)
+            self.status[widget].setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignCenter)
+            self.status[widget].setObjectName("Status" + str(Widget))
 
-            self.Rolluik1.raise_()
-            self.Status1.raise_()
+            self.rolluik[Widget].raise_()
+            self.status[widget].raise_()
 
-            if (w%2 == 0):
+            x += 1
+            if (x%2 == 0):
                 y += 1
                 x = 0
-            self.gridLayout_3.addWidget(self.Rolluik1Widget, y, x)
-            x += 1
+            self.gridLayout_3.addWidget(self.rolluikWidget[Widget], y, x)
 
+
+    def setDevices(self, devices):
+        self.devices = devices
 
