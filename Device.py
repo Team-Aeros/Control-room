@@ -2,14 +2,16 @@ import serial
 import time
 
 class Device():
-    def __init__ (self, port, sensor_type):
+    def __init__ (self, name, port, sensorType):
+        self.name = name
         self.port = port
-        self.sensor_type = sensor_type
+        self.sensorType = sensorType
         self.status = 1 # 1 = rolled in, 0 = rolled out
-        if self.sensor_type == "Light":
+        if self.sensorType == "Light":
             self.rolldown = 50
-        elif self.sensor_type == "Temp":
+        elif self.sensorType == "Temp":
             self.rolldown == 22
+        self.establisch_connection()
 
     def  set_rolldown(self, val):
         self.rolldown = val
@@ -27,6 +29,12 @@ class Device():
         self.ser.write(b'\xff') # Add to code to trigger function on arduino
         self.ser.write(b'\x20')
 
+    def get_status(self):
+        if self.status == 1:
+            return "Rolled in"
+        else:
+            return "Rolled out"
+
     def receive(self):
         transmission = int('{:08b}'.format(ord(self.ser.read())),2)
         value = 0
@@ -39,14 +47,14 @@ class Device():
                     value += transmission
             value = value / 10
             print(value) # Send value to graphs
-        elif transmission == 0b01010001
+        elif transmission == 0b01010001:
             self.status = 1
-        elif transmission == 0b01010000
+        elif transmission == 0b01010000:
             self.status = 0
 
 #Test code
-shutter_1 = Device("COM5", "Light")
-shutter_1.establisch_connection()
-print("Connection established")
-while True:
-    shutter_1.receive()
+#shutter_1 = Device("Attic", "COM5", "Light")
+#shutter_1.establisch_connection()
+#print("Connection established")
+#while True:
+#    shutter_1.receive()

@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         #set Rolluik1 and Status1
         if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].name)
-            self.mainGrid.Status1.setText(self.devices[0].getStatus())
+            self.mainGrid.Status1.setText(self.devices[0].get_status())
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -357,7 +357,7 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return None
 
-        newDevice = Device(nameRes, portRes, self.sensorType, lightRes, tempRes)
+        newDevice = Device(nameRes, portRes, self.sensorType)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
         device_added = QMessageBox()
