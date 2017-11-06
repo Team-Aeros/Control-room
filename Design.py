@@ -200,6 +200,8 @@ class Ui_MainWindow(object):
         if self.checkStringForNumber(minVal):
             self.currentDevice.minVal = int(minVal)
             print("Minimum value from " + self.currentDevice.name + " changed to " + minVal)
+        else:
+            self.showError("Not a number", "You have to enter a valid number!")
 
     def checkStringForNumber(self, string):
         numbers = ["0","1","2","3","4","5","6","7","8","9"]
@@ -359,7 +361,12 @@ class Ui_MainWindow(object):
         portRes = self.port.text()
         #lightRes = int(self.light.text())
         #tempRes = int(self.temp.text())
-        valRes = int(self.value.text())
+        if self.checkStringForNumber(self.value.text()):
+            valRes = int(self.value.text())
+        else:
+            self.showError("Not a number", "You have to enter a valid number")
+            self.value.setText("0")
+            return
 
         self.name.setText("")
         self.port.setText("COM0")
