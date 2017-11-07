@@ -39,6 +39,14 @@ class Device():
 			# print_status('Nothing to receive')
 			return
 
+		print_status('Received message')
+		transmission = int(ord(self.connection.read()))
+
+		if transmission != 0xFF and transmission != 0b01110000 and transmission != 0b01000000:
+			print(transmission)
+
+		return
+
 		transmission = int('{:08b}'.format(ord(data)),2) 																	# First transmission. Should be 0xff
 		value = 0																											# Set value to 0 for receiving data
 
