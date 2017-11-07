@@ -448,7 +448,7 @@ class Ui_MainWindow(object):
                 self.showPopup("e", "Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return
-
+              
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
@@ -470,7 +470,6 @@ class Ui_MainWindow(object):
         popup.setInformativeText(popupIText)
 
         popup.exec()
-
 
 
     def setCurrentDevice(self, name):
