@@ -7,6 +7,7 @@ def print_status(msg):
 
 
 class Device():
+
 	def __init__(self, name, portNumber, sensorType, minVal, maxLength):
 		self.name = name        																							# Custom name of device. For example: Living room
 		self.status = 1																										# 1 = rolled up, 0 = rolled down
@@ -97,9 +98,7 @@ class Device():
 		self.transmit(b'\x30')																								# Send rollDown code (0b00110000)
 		self.transmit(b'\x70')
 
-	# GUI display code
-	def getName(self):
-		return self.getName 																								# Returns name of a device
+	# GUI display code																								
 
 	def getStatus(self):
 		if self.status == 1:																								# If status of device = 1, then return Rolled Up
@@ -139,5 +138,6 @@ try:
 	#time.sleep(5)
 	#shutter.transmit(0xff)
 	#print("Rolling down")
+
 except Exception as e:
 	print(e)
