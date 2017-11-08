@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 80, 590))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(9, 9, 81, 551))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -65,7 +65,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addItem(spacerItem2)
 
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 810, 50))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -83,16 +83,8 @@ class Ui_MainWindow(object):
         self.Logo.setMinimumSize(QtCore.QSize(0, 0))
         self.Logo.setMaximumSize(QtCore.QSize(300, 30))
 
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(16)
-        font.setBold(True)
-        font.setWeight(75)
-        self.Logo.setFont(font)
-        self.Logo.setAutoFillBackground(True)
-        self.Logo.setFrameShape(QtWidgets.QFrame.Box)
-        self.Logo.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Logo.setObjectName("Logo")
+        self.Logo.setStyleSheet("font: cursive")
         self.horizontalLayout_2.addWidget(self.Logo)
 
         spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -131,17 +123,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(100, 60, 800, 540))
-        #self.stackedWidget.setMaximumWidth(800)
-        #self.stackedWidget.setMaximumHeight(540)
-        self.stackedWidget.setFixedSize(800, 540)
-        self.stackedWidget.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
+        #self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
+        #self.stackedWidget.move(100,100)
         #self.stackedWidget.setStyleSheet("background-color: black")
-
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
-        self.mainGrid = MainGrid(self.page0)
+        self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
         self.setupSettingsWindow()
@@ -174,10 +163,10 @@ class Ui_MainWindow(object):
 
 
         #set Rolluik1 and Status1
-        if len(self.devices) > 0:
+        """if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].name)
             self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #print(self.stackedWidget.currentIndex())
+        #print(self.stackedWidget.currentIndex())"""
 
     def setSensorType(self, type):
         if type == "Light":
@@ -237,7 +226,6 @@ class Ui_MainWindow(object):
 
         goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
         goBack.setText("Ok")
-        #goBack.clicked.connect(lambda: self.updateMaingrid())
         goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
         self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
@@ -333,6 +321,7 @@ class Ui_MainWindow(object):
         goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
         goBack.setText("Ok")
         goBack.setMaximumSize(QtCore.QSize(100,200))
+        #goBack.clicked.connect(lambda: self.updateMaingrid())
         goBack.clicked.connect(lambda: self.setIndex(0))
 
         layout.addRow(namelabel, self.name)
@@ -341,7 +330,6 @@ class Ui_MainWindow(object):
         layout.addRow(portlabel, self.port)
         layout.addRow(sensorlabel, sensor)
         layout.addRow(addDevice, goBack)
-        #self.stackedWidget.insertWidget(2,self.page_2)
 
         self.setSensorType("Light")
         self.stackedWidget.addWidget(self.page2)
@@ -371,6 +359,7 @@ class Ui_MainWindow(object):
         device_added.setWindowTitle("Info")
         device_added.setStandardButtons(QMessageBox.Cancel)
         device_added.exec_()
+        self.updateMaingrid()
 
     def showError(self, errorText, errorIText):
         error = QMessageBox()
@@ -450,7 +439,10 @@ class Ui_MainWindow(object):
         info.exec_()
 
     def updateMaingrid(self):
-        MainGrid.setDevices(self.devices)
+        self.page0.setParent(None)
+        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.mainGrid = MainGrid(self.page0, self.devices)
+        self.stackedWidget.insertWidget(0, self.mainGrid.page0)
 
 
 if __name__ == "__main__":
@@ -461,3 +453,4 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
