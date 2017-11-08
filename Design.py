@@ -442,7 +442,7 @@ class Ui_MainWindow(object):
         self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
-        self.stackedWidget.insertWidget(0, self.mainGrid.page0)
+        self.stackedWidget.insertWidget(0, self.mainGrid.page0) #this changed right
 
 
 if __name__ == "__main__":
