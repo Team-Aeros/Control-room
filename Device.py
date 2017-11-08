@@ -40,12 +40,6 @@ class Device():
 			return
 
 		print_status('Received message')
-		transmission = int(ord(self.connection.read()))
-
-		if transmission != 0xFF and transmission != 0b01110000 and transmission != 0b01000000:
-			print(transmission)
-
-		return
 
 		transmission = int('{:08b}'.format(ord(data)),2) 																	# First transmission. Should be 0xff
 		value = 0																											# Set value to 0 for receiving data
@@ -54,8 +48,8 @@ class Device():
 			return
 
 		print_status('Transmission received. Sending confirmation...')
-		self.transmit(b'\x60') 																								# Send confirmation
-		print_status('Confirmation sent')
+		#self.transmit(b'\x60') 																								# Send confirmation
+		#print_status('Confirmation sent')
 
 		print('First transmission: ', transmission) 																		# Used for testing remove later
 
@@ -63,7 +57,7 @@ class Device():
 			print_status('Preparing to receive multiple transmissions')
 
 			transmission = int('{:08b}'.format(ord(self.connection.read())),2) 												# Second transmission
-			self.transmit(b'\x60') 																							# Send confirmation
+			#self.transmit(b'\x60') 																							# Send confirmation
 			print('Instruction: ', transmission) 																			# Used for testing remove later
 
 			if transmission == 0b01000000: 																					# Check if transmission is sending data
@@ -71,7 +65,7 @@ class Device():
 
 				while True:
 					transmission = int('{:08b}'.format(ord(self.connection.read())),2) 										# Data transmission
-					self.transmit(b'\x60') 																					# Send confirmation
+					#self.transmit(b'\x60') 																					# Send confirmation
 					print('Data transmission: ', transmission) 																# Used for testing remove later
 
 					if transmission == 0b01110000: 																			# Check if end of transmission is received
@@ -96,10 +90,12 @@ class Device():
 	def rollUp(self):
 		self.transmit(b'\xff')																								# Prepare device to receive instruction
 		self.transmit(b'\x20')																								# Send rollUp code (0b00100000)
+		self.transmit(b'\x70')
 
 	def rollDown(self):
 		self.transmit(b'\xff')																								# Prepare device to receive instruction
 		self.transmit(b'\x30')																								# Send rollDown code (0b00110000)
+		self.transmit(b'\x70')
 
 	# GUI display code
 	def getName(self):
