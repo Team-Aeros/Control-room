@@ -50,5 +50,3 @@ class MainGrid():
                 x = 0
             self.gridLayout_3.addWidget(self.Rolluik1Widget, y, x)
             x += 1
-
-
