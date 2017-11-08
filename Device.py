@@ -2,51 +2,105 @@ import serial
 import time
 
 class Device():
-    def __init__ (self, port, sensor_type):
-        self.port = port
-        self.sensor_type = sensor_type
-        self.status = 1 # 1 = rolled in, 0 = rolled out
-        if self.sensor_type == "Light":
-            self.rolldown = 50
-        elif self.sensor_type == "Temp":
-            self.rolldown == 22
 
-    def  set_rolldown(self, val):
-        self.rolldown = val
+	def __init__(self, name, portNumber, sensorType, minVal, maxLength):
+		self.name = name        																							# Custom name of device. For example: Living room
+		self.status = 1																										# 1 = rolled up, 0 = rolled down
+		self.portNumber = portNumber																						# Port used to connect to device
+		self.sensorType = sensorType																						# Type of sensor used in device
+		self.maxLength = maxLength																							# Maximun roll distance of the shutter
+		self.rollPercentage = 0																								# Percentage shutter has rolled out. Between 0 and 100
 
-    def establisch_connection(self):
-        self.ser = serial.Serial(self.port, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+		if minVal != 0:																										# If custom value is given use that value
+			self.minVal = minVal		
+		elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
+			self.minVal = 50
+		elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
+			self.minVal = 22
 
-    # Roll down shutter (Only available in manual mode)
-    def roll_down(self):
-        self.ser.write(b'\xff') # Add to code to trigger function on arduino
-        self.ser.write(b'\x30')
+		self.establishConnection()																							# Establish connection using given port
+		# Send settings to arduino
 
-    # Roll up shutter (Only available in manual mode)
-    def roll_up(self):
-        self.ser.write(b'\xff') # Add to code to trigger function on arduino
-        self.ser.write(b'\x20')
+	# Connection code
+	def establishConnection(self):
+		self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
 
-    def receive(self):
-        transmission = int('{:08b}'.format(ord(self.ser.read())),2)
-        value = 0
-        if transmission == 0b01000000:
-            while True:
-                transmission = int('{:08b}'.format(ord(self.ser.read())),2)
-                if transmission == 0b01110000:
-                    break
-                else:
-                    value += transmission
-            value = value / 10
-            print(value) # Send value to graphs
-        elif transmission == 0b01010001
-            self.status = 1
-        elif transmission == 0b01010000
-            self.status = 0
+	def transmit(self, message):
+		self.connection.write(message)
 
-#Test code
-shutter_1 = Device("COM5", "Light")
-shutter_1.establisch_connection()
-print("Connection established")
-while True:
-    shutter_1.receive()
+	def receive(self):
+		transmission = int('{:08b}'.format(ord(self.connection.read())),2) 													# First transmission. Should be 0xff
+		value = 0																											# Set value to 0 for receiving data
+
+		if transmission != 0xff:																							# Starts transmission cycle
+			return
+
+		self.transmit(b'\x60') 																								# Send confirmation
+
+		print('First transmission: ', transmission) 																		# Used for testing remove later
+
+		while True:
+			transmission = int('{:08b}'.format(ord(self.connection.read())),2) 												# Second transmission
+			self.transmit(b'\x60') 																							# Send confirmation
+			print('Second transmission: ', transmission) 																	# Used for testing remove later
+
+			if transmission == 0b01000000: 																					# Check if transmission is sending data
+				while True:
+					transmission = int('{:08b}'.format(ord(self.connection.read())),2) 										# Data transmission
+					self.transmit(b'\x60') 																					# Send confirmation
+					print('Data transmission: ', transmission) 																# Used for testing remove later
+
+					if transmission == 0b01110000: 																			# Check if end of transmission is received
+						break
+					else:
+						value += transmission																				# Add transmitted value to value
+				value = value / 10
+				print('Received data: ', value) 																			# Used for testing remove later
+				break
+			elif transmission == 0b01010001:																				# Change shutter status to rolled up
+				self.status = 1
+				print('Status set to 1') 																					# Used for testing remove later
+				break
+			elif transmission == 0b01010000:																				# Change shutter status to rolled down
+				self.status = 0
+				print('Status set to 0') 																					# Used for testing remove later
+				break
+
+	def rollUp(self):
+		self.transmit(b'\xff')																								# Prepare device to receive instruction
+		self.transmit(b'\x20')																								# Send rollUp code (0b00100000)
+
+	def rollDown(self):
+		self.transmit(b'\xff')																								# Prepare device to receive instruction
+		self.transmit(b'\x30')																								# Send rollDown code (0b00110000)
+
+	# GUI display code																								
+
+	def getStatus(self):
+		if self.status == 1:																								# If status of device = 1, then return Rolled Up
+			return "Rolled up"
+		elif self.status == 0:																								# If status of device = 0, then return Rolled Down
+			return "Rolled down"
+
+	# Setting code
+	def setMinVal(self, minVal):
+		self.minVal = minVal 																								# Change value of minVal to new user defined value
+		# Add code to send this to Device 																					# Send new value to device
+
+	def setRollPercentage(self, percentage):																				# Not working
+		roll = percentage - self.rollPercentage 																			#											
+		self.transmit(roll)
+		self.rollPercentage = percentage
+
+# Test code
+try:
+	shutter = Device("Attic", "COM5", "Light", 0, 1.50)
+	print("Connection established on COM5")
+	while True:
+		shutter.receive()
+	#time.sleep(5)
+	#shutter.transmit(0xff)
+	#print("Rolling down")
+except:
+	print("Failed to connect with device on COM5")
+
