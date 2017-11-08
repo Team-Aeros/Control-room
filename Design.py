@@ -71,7 +71,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addItem(spacerItem2)
 
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 52))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -137,13 +137,14 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(200, 200, 200, 200))
-        self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
-        self.stackedWidget.move(100,100)
+        self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
+        #self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
+        #self.stackedWidget.move(100,100)
+        #self.stackedWidget.setStyleSheet("background-color: black")
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
-        self.mainGrid = MainGrid(self.page0)
+        self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
         self.setupSettingsWindow()
@@ -179,10 +180,11 @@ class Ui_MainWindow(object):
             self.devicesBoxManual.addItem(device.name)
 
         #set Rolluik1 and Status1
-        if len(self.devices) > 0:
+        """if len(self.devices) > 0:
             self.mainGrid.Rolluik1.setText(self.devices[0].name)
             self.mainGrid.Status1.setText(self.devices[0].getStatus())
-            self.minVal.setText(str(self.currentDevice.minVal))
+        #print(self.stackedWidget.currentIndex())"""
+            #self.minVal.setText(str(self.currentDevice.minVal))
         #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
@@ -448,10 +450,17 @@ class Ui_MainWindow(object):
                 self.showPopup("e", "Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return
-              
+
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
+        device_added = QMessageBox()
+        device_added.setIcon(QMessageBox.Information)
+        device_added.setText("Device with name: " + nameRes + " has been added!")
+        device_added.setWindowTitle("Info")
+        device_added.setStandardButtons(QMessageBox.Cancel)
+        device_added.exec_()
+        self.updateMaingrid()
 
         self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
         self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
@@ -519,6 +528,13 @@ class Ui_MainWindow(object):
         text = title_text[1]
 
         self.showPopup("i", title, text)
+
+    def updateMaingrid(self):
+        self.page0.setParent(None)
+        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.mainGrid = MainGrid(self.page0, self.devices)
+        self.stackedWidget.insertWidget(0, self.mainGrid.page0) #this changed right
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
