@@ -10,8 +10,8 @@ class Device():
 		self.portNumber = portNumber																						# Port used to connect to device
 		self.sensorType = sensorType																						# Type of sensor used in device
 		self.maxLength = maxLength																							# Maximun roll distance of the shutter
-		self.rollPercentage = 0																								# Percentage shutter has rolled out. Between 0 and 100
-
+		self.rollPercentage = 0																						# Percentage shutter has rolled out. Between 0 and 100
+		self.hasConnection = False
 		if minVal != 0:																										# If custom value is given use that value
 			self.minVal = minVal		
 		elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
@@ -25,7 +25,11 @@ class Device():
 
 	# Connection code
 	def establishConnection(self):
-		self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
+		try:
+			self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
+			self.hasConnection = True
+		except:
+			self.hasConnection = False
 
 	def transmit(self, message):
 		self.connection.write(message)

@@ -453,12 +453,18 @@ class Ui_MainWindow(object):
                 return
 
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
-        self.devices.append(newDevice)
-        self.setCurrentDevice(self.devices[0].name)
-        self.updateMaingrid(self.MainWindow)
 
-        self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
-        self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
+        if newDevice.hasConnection == True:
+            self.devices.append(newDevice)
+            self.setCurrentDevice(self.devices[0].name)
+            self.updateMaingrid(self.MainWindow)
+
+            self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
+            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
+        else:
+            self.log.writeInLog("w", "Could not add device: " + nameRes + ". Not connected to port: " + portRes)
+            self.showPopup("e", "Could not add device!", "Device not connected to port: " + portRes)
+
 
     def showPopup(self, type, popupText, popupIText):
         popup = QMessageBox()
@@ -470,6 +476,8 @@ class Ui_MainWindow(object):
             popup.setIcon(QMessageBox.Information)
             popup.setWindowTitle("Info")
             self.log.writeInLog("i", "Information popup shown: " + popupText + " | " + popupIText)
+        else:
+            print("test")
         popup.setText(popupText)
         popup.setInformativeText(popupIText)
 
