@@ -1,5 +1,6 @@
 import serial
 import time
+from threading import Thread
 
 class Device():
 
@@ -18,7 +19,8 @@ class Device():
 		elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
 			self.minVal = 22
 
-		#self.establishConnection()																							# Establish connection using given port
+		connection = Thread(target=self.establishConnection)																							# Establish connection using given port
+		connection.start()
 		# Send settings to arduino
 
 	# Connection code
@@ -91,6 +93,3 @@ class Device():
 		roll = percentage - self.rollPercentage 																			#											
 		self.transmit(roll)
 		self.rollPercentage = percentage
-
-
-

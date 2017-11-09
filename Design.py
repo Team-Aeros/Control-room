@@ -540,5 +540,7 @@ class main():
             MainWindow.show()
             sys.exit(app.exec_())
 
-main = main()
+mainUi = main()
+
+
 
