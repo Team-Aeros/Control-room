@@ -18,7 +18,7 @@ class Device():
 		elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
 			self.minVal = 22
 
-		self.establishConnection()																							# Establish connection using given port
+		#self.establishConnection()																							# Establish connection using given port
 		# Send settings to arduino
 
 	# Connection code
@@ -92,15 +92,5 @@ class Device():
 		self.transmit(roll)
 		self.rollPercentage = percentage
 
-# Test code
-try:
-	shutter = Device("Attic", "COM5", "Light", 0, 1.50)
-	print("Connection established on COM5")
-	while True:
-		shutter.receive()
-	#time.sleep(5)
-	#shutter.transmit(0xff)
-	#print("Rolling down")
-except:
-	print("Failed to connect with device on COM5")
+
 

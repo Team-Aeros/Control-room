@@ -26,8 +26,9 @@ class Ui_MainWindow(object):
 
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(918, 645)
+        self.MainWindow = MainWindow
+        self.MainWindow.setObjectName("MainWindow")
+        self.MainWindow.resize(918, 645)
         self.devices = []
         self.currentDevice = None
         self.setupLog()
@@ -454,7 +455,7 @@ class Ui_MainWindow(object):
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
-        self.updateMaingrid()
+        self.updateMaingrid(self.MainWindow)
 
         self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
         self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
@@ -523,17 +524,21 @@ class Ui_MainWindow(object):
 
         self.showPopup("i", title, text)
 
-    def updateMaingrid(self):
+    def updateMaingrid(self, MainWindow):
         self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0) #this changed right
 
+class main():
+    def __init__(self):
+        if __name__ == "__main__":
+            app = QtWidgets.QApplication(sys.argv)
+            MainWindow = QtWidgets.QMainWindow()
+            ui = Ui_MainWindow()
+            ui.setupUi(MainWindow)
+            MainWindow.show()
+            sys.exit(app.exec_())
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+main = main()
+
