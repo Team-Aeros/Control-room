@@ -454,12 +454,6 @@ class Ui_MainWindow(object):
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
-        device_added = QMessageBox()
-        device_added.setIcon(QMessageBox.Information)
-        device_added.setText("Device with name: " + nameRes + " has been added!")
-        device_added.setWindowTitle("Info")
-        device_added.setStandardButtons(QMessageBox.Cancel)
-        device_added.exec_()
         self.updateMaingrid()
 
         self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
