@@ -514,7 +514,9 @@ class Ui_MainWindow(object):
 
         #self.Rolluik1.setText(_translate("MainWindow", self.devices[0].getName()))
         #self.Status1.setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))
-
+        """for widget in self.devices:
+            self.devices[widget].getStatus()
+            self..setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))"""
 
     #Makes popup with info
     def showInfo(self):
@@ -530,11 +532,24 @@ class Ui_MainWindow(object):
         self.showPopup("i", title, text)
 
     def updateMaingrid(self):
-        self.page0.setParent(None)
+        self.page0.setParent(None)      #Deleting old page0. Garbagecollection doing it's work
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0) #this changed right
 
+    def setStatus(self):
+        # set Rolluik1 and Status1
+        """if len(self.devices) > 0:
+            self.mainGrid.Rolluik1.setText(self.devices[0].name)
+            self.mainGrid.Status1.setText(self.devices[0].getStatus())
+        #print(self.stackedWidget.currentIndex())"""
+        # self.minVal.setText(str(self.currentDevice.minVal))
+        # print(self.stackedWidget.currentIndex())
+
+        for WidgetLong in self.devices:
+            self.Widget = WidgetLong.name
+            self.Widgetstatus = WidgetLong.getStatus
+            MainGrid.setStatus(self.Widget, self.Widgetstatus)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

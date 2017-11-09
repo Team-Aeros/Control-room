@@ -54,6 +54,9 @@ class MainGrid():
             self.status[Widget].setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignCenter)
             self.status[Widget].setObjectName("Status" + str(Widget))
 
+            self.rolluik[Widget].setText(Widget)
+            self.status[Widget].setText(WidgetLong.getStatus)
+
             self.rolluik[Widget].raise_()
             self.status[Widget].raise_()
 
@@ -66,3 +69,5 @@ class MainGrid():
         self.ghostWidget = QtWidgets.QWidget(self.gridLayoutWidget)
         self.gridLayout_3.addWidget(self.ghostWidget, 3, self.maxXvalue)
 
+    def setStatus(self, widgetName, widgetStatus):
+        self.status[widgetName].setText(widgetStatus)
