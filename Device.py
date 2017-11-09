@@ -1,5 +1,6 @@
 import serial
 import time
+from threading import Thread
 
 
 def print_status(msg):
@@ -14,8 +15,8 @@ class Device():
 		self.portNumber = portNumber																						# Port used to connect to device
 		self.sensorType = sensorType																						# Type of sensor used in device
 		self.maxLength = maxLength																							# Maximun roll distance of the shutter
-		self.rollPercentage = 0																								# Percentage shutter has rolled out. Between 0 and 100
-
+		self.rollPercentage = 0																						# Percentage shutter has rolled out. Between 0 and 100
+		self.hasConnection = False
 		if minVal != 0:																										# If custom value is given use that value
 			self.minVal = minVal		
 		elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
@@ -23,12 +24,17 @@ class Device():
 		elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
 			self.minVal = 22
 
-		self.establishConnection()																							# Establish connection using given port
+		connection = Thread(target=self.establishConnection)																							# Establish connection using given port
+		connection.start()
 		# Send settings to arduino
 
 	# Connection code
 	def establishConnection(self):
-		self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
+		try:
+			self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
+			self.hasConnection = True
+		except:
+			self.hasConnection = False
 
 	def transmit(self, message):
 		self.connection.write(message)
@@ -116,6 +122,7 @@ class Device():
 		self.transmit(roll)
 		self.rollPercentage = percentage
 
+
 # Test code
 port = '/dev/ttyACM0'
 
@@ -141,3 +148,4 @@ try:
 
 except Exception as e:
 	print(e)
+
