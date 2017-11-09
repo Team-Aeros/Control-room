@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.log.resetLog()
 
     #sets up basic ui with buttons: manual, graphs, settings and info
-    def setupUi(self, MainWindow):
+    def setupUi(self, mainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(918, 645)
         self.devices = []
@@ -454,12 +454,6 @@ class Ui_MainWindow(object):
         newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#lightRes, tempRes)
         self.devices.append(newDevice)
         self.setCurrentDevice(self.devices[0].name)
-        device_added = QMessageBox()
-        device_added.setIcon(QMessageBox.Information)
-        device_added.setText("Device with name: " + nameRes + " has been added!")
-        device_added.setWindowTitle("Info")
-        device_added.setStandardButtons(QMessageBox.Cancel)
-        device_added.exec_()
         self.updateMaingrid()
 
         self.log.writeInLog("i", "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(valRes) + " | Max roll length: " + str(maxRollRes))
@@ -537,19 +531,14 @@ class Ui_MainWindow(object):
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0) #this changed right
 
-    def setStatus(self):
-        # set Rolluik1 and Status1
-        """if len(self.devices) > 0:
-            self.mainGrid.Rolluik1.setText(self.devices[0].name)
-            self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #print(self.stackedWidget.currentIndex())"""
-        # self.minVal.setText(str(self.currentDevice.minVal))
-        # print(self.stackedWidget.currentIndex())
+    def updatestatus(self):
+        for widgetLong in self.devices:
+            widgetName = widgetLong.name
+            widgetStatus = widgetLong.getStatus
+            MainGrid.setStatus(widgetName, widgetStatus)
 
-        for WidgetLong in self.devices:
-            self.Widget = WidgetLong.name
-            self.Widgetstatus = WidgetLong.getStatus
-            MainGrid.setStatus(self.Widget, self.Widgetstatus)
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

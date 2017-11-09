@@ -26,45 +26,45 @@ class MainGrid():
 
     def createPage(self):
         for WidgetLong in self.devices:
-            Widget = WidgetLong.name
+            WidgetDevice = WidgetLong.name
         #for Widget in range(0, 3):   #Debug purposes
-            self.dictWidgets[Widget] = self.rolluikWidget
+            self.dictWidgets[WidgetDevice] = self.rolluikWidget
 
-            self.rolluikWidget[Widget] = QtWidgets.QWidget(self.gridLayoutWidget)
+            self.rolluikWidget[WidgetDevice] = QtWidgets.QWidget(self.gridLayoutWidget)
             sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,
                                                QtWidgets.QSizePolicy.Maximum)
 
-            self.rolluikWidget[Widget].setSizePolicy(sizePolicy)
-            self.rolluikWidget[Widget].setMinimumSize(QtCore.QSize(250, 100))
-            self.rolluikWidget[Widget].setMaximumSize(QtCore.QSize(250, 100))
-            self.rolluikWidget[Widget].setAutoFillBackground(True)
-            self.rolluikWidget[Widget].setObjectName("Rolluik " + str(Widget) + "Widget")
-            self.rolluik[Widget] = QtWidgets.QLabel(self.rolluikWidget[Widget])
-            self.rolluik[Widget].setGeometry(QtCore.QRect(0, 0, 250, 100))
-            self.rolluik[Widget].setObjectName("Rolluik" + str(Widget))
-            self.rolluikWidget[Widget].setStyleSheet("border: 3px solid gray")
+            self.rolluikWidget[WidgetDevice].setSizePolicy(sizePolicy)
+            self.rolluikWidget[WidgetDevice].setMinimumSize(QtCore.QSize(250, 100))
+            self.rolluikWidget[WidgetDevice].setMaximumSize(QtCore.QSize(250, 100))
+            self.rolluikWidget[WidgetDevice].setAutoFillBackground(True)
+            self.rolluikWidget[WidgetDevice].setObjectName("Rolluik " + str(WidgetDevice) + "Widget")
+            self.rolluik[WidgetDevice] = QtWidgets.QLabel(self.rolluikWidget[WidgetDevice])
+            self.rolluik[WidgetDevice].setGeometry(QtCore.QRect(0, 0, 250, 100))
+            self.rolluik[WidgetDevice].setObjectName("Rolluik" + str(WidgetDevice))
+            self.rolluikWidget[WidgetDevice].setStyleSheet("border: 3px solid gray")
 
-            self.status[Widget] = QtWidgets.QLabel(self.rolluikWidget[Widget])
-            self.status[Widget].setFixedSize(100, 20)
-            self.status[Widget].setAlignment(QtCore.Qt.AlignRight)
-            self.status[Widget].setAutoFillBackground(True)
-            self.status[Widget].setFrameShape(QtWidgets.QFrame.StyledPanel)
-            self.status[Widget].setFrameShadow(QtWidgets.QFrame.Plain)
-            self.status[Widget].setTextFormat(QtCore.Qt.PlainText)
-            self.status[Widget].setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignCenter)
-            self.status[Widget].setObjectName("Status" + str(Widget))
+            self.status[WidgetDevice] = QtWidgets.QLabel(self.rolluikWidget[WidgetDevice])
+            self.status[WidgetDevice].setFixedSize(100, 20)
+            self.status[WidgetDevice].setAlignment(QtCore.Qt.AlignRight)
+            self.status[WidgetDevice].setAutoFillBackground(True)
+            self.status[WidgetDevice].setFrameShape(QtWidgets.QFrame.StyledPanel)
+            self.status[WidgetDevice].setFrameShadow(QtWidgets.QFrame.Plain)
+            self.status[WidgetDevice].setTextFormat(QtCore.Qt.PlainText)
+            self.status[WidgetDevice].setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignCenter)
+            self.status[WidgetDevice].setObjectName("Status" + str(WidgetDevice))
 
-            self.rolluik[Widget].setText(Widget)
-            self.status[Widget].setText(WidgetLong.getStatus)
+            self.rolluik[WidgetDevice].setText(WidgetDevice)
+            self.status[WidgetDevice].setText(WidgetLong.getStatus())
 
-            self.rolluik[Widget].raise_()
-            self.status[Widget].raise_()
+            self.rolluik[WidgetDevice].raise_()
+            self.status[WidgetDevice].raise_()
 
             self.x += 1
             if (self.x%self.maxXvalue == 0):
                 self.y += 1
                 self.x = 0
-            self.gridLayout_3.addWidget(self.rolluikWidget[Widget], self.y, self.x)
+            self.gridLayout_3.addWidget(self.rolluikWidget[WidgetDevice], self.y, self.x)
 
         self.ghostWidget = QtWidgets.QWidget(self.gridLayoutWidget)
         self.gridLayout_3.addWidget(self.ghostWidget, 3, self.maxXvalue)
