@@ -2,6 +2,11 @@ import serial
 import time
 from threading import Thread
 
+
+def print_status(msg):
+	print('=> Debug: {0}'.format(msg))
+
+
 class Device():
 
 	def __init__(self, name, portNumber, sensorType, minVal, maxLength):
@@ -26,7 +31,7 @@ class Device():
 	# Connection code
 	def establishConnection(self):
 		try:
-			self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
+			self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
 			self.hasConnection = True
 		except:
 			self.hasConnection = False
@@ -35,50 +40,69 @@ class Device():
 		self.connection.write(message)
 
 	def receive(self):
-		transmission = int('{:08b}'.format(ord(self.connection.read())),2) 													# First transmission. Should be 0xff
+		data = self.connection.read()
+
+		if not data:
+			# print_status('Nothing to receive')
+			return
+
+		print_status('Received message')
+
+		transmission = int('{:08b}'.format(ord(data)),2) 																	# First transmission. Should be 0xff
 		value = 0																											# Set value to 0 for receiving data
 
 		if transmission != 0xff:																							# Starts transmission cycle
 			return
 
-		self.transmit(b'\x60') 																								# Send confirmation
+		print_status('Transmission received. Sending confirmation...')
+		#self.transmit(b'\x60') 																								# Send confirmation
+		#print_status('Confirmation sent')
 
 		print('First transmission: ', transmission) 																		# Used for testing remove later
 
 		while True:
+			print_status('Preparing to receive multiple transmissions')
+
 			transmission = int('{:08b}'.format(ord(self.connection.read())),2) 												# Second transmission
-			self.transmit(b'\x60') 																							# Send confirmation
-			print('Second transmission: ', transmission) 																	# Used for testing remove later
+			#self.transmit(b'\x60') 																							# Send confirmation
+			print('Instruction: ', transmission) 																			# Used for testing remove later
 
 			if transmission == 0b01000000: 																					# Check if transmission is sending data
+				print_status('Transmission received: Arduino is trying to send data')
+
 				while True:
 					transmission = int('{:08b}'.format(ord(self.connection.read())),2) 										# Data transmission
-					self.transmit(b'\x60') 																					# Send confirmation
+					#self.transmit(b'\x60') 																					# Send confirmation
 					print('Data transmission: ', transmission) 																# Used for testing remove later
 
 					if transmission == 0b01110000: 																			# Check if end of transmission is received
+						print_status('Nothing more to do')
 						break
 					else:
 						value += transmission																				# Add transmitted value to value
-				value = value / 10
+
+				print_status('Preparing to read received data')
+				value /= 10
 				print('Received data: ', value) 																			# Used for testing remove later
 				break
 			elif transmission == 0b01010001:																				# Change shutter status to rolled up
+				print_status('Status has been set to 1')
 				self.status = 1
-				print('Status set to 1') 																					# Used for testing remove later
 				break
 			elif transmission == 0b01010000:																				# Change shutter status to rolled down
+				print_status('Status has been set to 0')
 				self.status = 0
-				print('Status set to 0') 																					# Used for testing remove later
 				break
 
 	def rollUp(self):
 		self.transmit(b'\xff')																								# Prepare device to receive instruction
 		self.transmit(b'\x20')																								# Send rollUp code (0b00100000)
+		self.transmit(b'\x70')
 
 	def rollDown(self):
 		self.transmit(b'\xff')																								# Prepare device to receive instruction
 		self.transmit(b'\x30')																								# Send rollDown code (0b00110000)
+		self.transmit(b'\x70')
 
 	# GUI display code																								
 
@@ -97,3 +121,31 @@ class Device():
 		roll = percentage - self.rollPercentage 																			#											
 		self.transmit(roll)
 		self.rollPercentage = percentage
+
+
+# Test code
+port = '/dev/ttyACM0'
+
+try:
+	shutter = Device("Attic", port, "Light", 0, 1.50)
+	print("Connection established on {0}".format(port))
+
+	counter = 0
+
+	while True:
+		#print_status('Sending empty transmission to Arduino')
+		shutter.transmit(b'\x01')
+
+		#print_status('begin transmission cycle: {0}'.format(counter))
+		shutter.receive()
+		#print_status('end')
+
+		counter += 1
+
+	#time.sleep(5)
+	#shutter.transmit(0xff)
+	#print("Rolling down")
+
+except Exception as e:
+	print(e)
+
