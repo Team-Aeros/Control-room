@@ -54,7 +54,7 @@ class Device():
 
         print_status('Received message')
 
-        transmission = int('{:08b}'.format(ord(data)),2) 																	# First transmission. Should be 0xff
+        transmission = int('{:08b}'.format(ord(self.data)),2) 																	# First transmission. Should be 0xff
         value = 0																											# Set value to 0 for receiving data
 
         if transmission != 0xff:																							# Starts transmission cycle

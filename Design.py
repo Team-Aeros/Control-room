@@ -1,6 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
-from stringNames import stringNames
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
@@ -277,10 +276,10 @@ class Ui_MainWindow(object):
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
             goBack.move(450, 400)
 
-            self.start = QtWidgets.QPushButton(self.graphWidget)
-            self.start.setText("start")
-            self.start.clicked.connect(self.fillGraph)
-            self.start.move(450, 375)
+            start = QtWidgets.QPushButton(self.graphWidget)
+            start.setText("start")
+            start.clicked.connect(self.fillGraph)
+            start.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
@@ -511,14 +510,7 @@ class Ui_MainWindow(object):
 
     # Makes popup with info
     def showInfo(self):
-        s = stringNames()
-        s.setInfoText("Aeros Development", "we made this dashboard")
-        string = s.getInfoText()
-        title_text = string.split(";", )
-        title = title_text[0]
-        text = title_text[1]
-
-        self.showPopup("i", title, text)
+        self.showPopup("i", "Aeros Development", "we made this dashboard")
 
     def updateMaingrid(self, MainWindow):
         self.page0.setParent(None)
