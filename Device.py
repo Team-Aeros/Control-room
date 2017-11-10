@@ -7,7 +7,7 @@ def print_status(msg):
     print('=> Debug: {0}'.format(msg))
 
 
-class Device():#Thread):
+class Device():
 
     def __init__(self, name, portNumber, sensorType, minVal, maxLength):
         #Thread.__init__(self)
@@ -36,7 +36,6 @@ class Device():#Thread):
         self.receive()"""
     # Connection code
     def establishConnection(self):
-        global hasConnection
         try:
             self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
         except:
@@ -47,9 +46,9 @@ class Device():#Thread):
         self.connection.write(message)
 
     def receive(self):
-        data = self.connection.read()
+        self.data = self.connection.read()
 
-        if not data:
+        if not self.data:
             # print_status('Nothing to receive')
             return
 

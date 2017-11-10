@@ -277,10 +277,10 @@ class Ui_MainWindow(object):
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
             goBack.move(450, 400)
 
-            start = QtWidgets.QPushButton(self.graphWidget)
-            start.setText("start")
-            start.clicked.connect(self.fillGraph)
-            start.move(450, 375)
+            self.start = QtWidgets.QPushButton(self.graphWidget)
+            self.start.setText("start")
+            self.start.clicked.connect(self.fillGraph)
+            self.start.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
@@ -295,7 +295,11 @@ class Ui_MainWindow(object):
 
     def fillGraph(self):
         # fill graph
-        data = [random.uniform(0.0, 100.0) for i in range(25)]  # testdata
+        #data = [random.uniform(0.0, 100.0) for i in range(25)]  # testdata
+        self.currentDevice.receive()
+        data = []
+        for i in range(25):
+            data.append(self.currentDevice.data)
         try:
             self.canvas.plot(data, self.currentDevice.sensorType)
         except:
@@ -405,7 +409,9 @@ class Ui_MainWindow(object):
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
     def rollOut(self, int):
-        print("Placeholder function to roll out the shutter " + str(int))
+        self.currentDevice.rollDown()
+        self.currentDevice.status = 0
+        #print("Placeholder function to roll out the shutter " + str(int))
 
     def addDeviceNoPar(self):
         nameRes = self.name.text()
@@ -441,17 +447,16 @@ class Ui_MainWindow(object):
                 self.showPopup("e", "Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return
-        try:
+        if portRes == "COM5":
             newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)
             self.devices.append(newDevice)
             self.setCurrentDevice(self.devices[0].name)
             self.updateMaingrid(self.MainWindow)
+            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
             self.log.writeInLog("i",
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
-        except:
-            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
-
+        else:
             self.log.writeInLog("w", "Could not add device: " + nameRes)
             self.showPopup("e", "Could not add device!", "An error has occurred")
 
