@@ -447,17 +447,20 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return
         try:
-            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)
+            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)  # lightRes, tempRes)
             self.devices.append(newDevice)
             self.setCurrentDevice(self.devices[0].name)
-            self.updateMaingrid(self.MainWindow)
-            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
+
             self.log.writeInLog("i",
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
+            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
+            self.updateMaingrid(self.MainWindow)
         except:
             self.log.writeInLog("w", "Could not add device: " + nameRes)
             self.showPopup("e", "Could not add device!", "An error has occurred")
+            newDevice = None
+
 
     def showPopup(self, type, popupText, popupIText):
         popup = QMessageBox()

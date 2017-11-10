@@ -1,22 +1,20 @@
 import serial
 import time
-from threading import Thread
-from PyQt5.QtWidgets import QMessageBox
+
 
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
 
 
 class Device():
-
     def __init__(self, name, portNumber, sensorType, minVal, maxLength):
-        #Thread.__init__(self)
         self.name = name        																							# Custom name of device. For example: Living room
         self.status = 1																										# 1 = rolled up, 0 = rolled down
         self.portNumber = portNumber																						# Port used to connect to device
         self.sensorType = sensorType																						# Type of sensor used in device
         self.maxLength = maxLength																							# Maximun roll distance of the shutter
-        self.rollPercentage = 0																						        # Percentage shutter has rolled out. Between 0 and 100
+        self.rollPercentage = 0																								# Percentage shutter has rolled out. Between 0 and 100
+
         if minVal != 0:																										# If custom value is given use that value
             self.minVal = minVal
         elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
@@ -24,96 +22,87 @@ class Device():
         elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
             self.minVal = 22
 
-        connection = Thread(target=self.establishConnection)																							# Establish connection using given port
-        connection.setDaemon(True)
-        connection.start()
-        #print(connection) debug
-        #print("create thread:", connection.is_alive()) debug
-    # Send settings to arduino
+        self.establishConnection()																							# Establish connection using given port
+        time.sleep(2)																										# Wait to finish establishing connection
 
-    """def run(self):
-        self.establishConnection()
-        self.receive()"""
+        self.transmit(0xff)																									# Start maxLength transmission
+        self.transmit(0b00010001)																							# Send code to set maxLength
+        self.transmit(int(10.0 * self.maxLength))																			# Send maxLength value
+        self.transmit(0b01110000)																							# End data transmission
+
+        time.sleep(1)																										# Pause between transmission
+
+        self.transmit(0xff)																									# Start minVal transmission
+        self.transmit(0b00010010)																							# Send code to set minVal
+        value = int(10 * self.minVal)																						# Turn float into integer
+        while True:
+            if (value - 255) > 0:																							# If value is larger than 8 bits send 255
+                self.transmit(255)
+                value -= 255																								# Subtract 255 from value
+            else:																											# Else send value
+                self.transmit(value)
+                break
+        self.transmit(0b01110000)																							# End data transmission
+
     # Connection code
     def establishConnection(self):
-        try:
-            self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
-        except:
-            popup = QMessageBox()
-            popup.setIcon(QMessageBox.Critical)
-            popup.setWindowTitle("Error")
-            popup.setText("No device connected to " + self.portNumber)
-            #raise ValueError("No device connected")
+        self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
 
     def transmit(self, message):
-        self.connection.write(message)
+        self.connection.write(bytes([message]))																				# Send message to device, Can use decimal, binary
 
     def receive(self):
-        self.data = self.connection.read()
+        data = self.connection.read()
 
-        if not self.data:
-            # print_status('Nothing to receive')
+        if not data:
             return
 
-        print_status('Received message')
+        transmission = int(ord(data))
+        value = 0
 
-        transmission = int('{:08b}'.format(ord(self.data)),2) 																	# First transmission. Should be 0xff
-        value = 0																											# Set value to 0 for receiving data
-
-        if transmission != 0xff:																							# Starts transmission cycle
+        if transmission != 0xff:
             return
-
-        print_status('Transmission received. Sending confirmation...')
-        #self.transmit(b'\x60') 																								# Send confirmation
-        #print_status('Confirmation sent')
-
-        print('First transmission: ', transmission) 																		# Used for testing remove later
 
         while True:
-            print_status('Preparing to receive multiple transmissions')
+            data = self.connection.read()
+            transmission = int(ord(data))
 
-            transmission = int('{:08b}'.format(ord(self.connection.read())),2) 												# Second transmission
-            #self.transmit(b'\x60') 																							# Send confirmation
-            print('Instruction: ', transmission) 																			# Used for testing remove later
-
-            if transmission == 0b01000000: 																					# Check if transmission is sending data
-                print_status('Transmission received: Arduino is trying to send data')
-
+            if transmission == 0b01000000:
                 while True:
-                    transmission = int('{:08b}'.format(ord(self.connection.read())),2) 										# Data transmission
-                    #self.transmit(b'\x60') 																					# Send confirmation
-                    print('Data transmission: ', transmission) 																# Used for testing remove later
+                    data = self.connection.read()
+                    transmission = int(ord(data))
 
-                    if transmission == 0b01110000: 																			# Check if end of transmission is received
-                        print_status('Nothing more to do')
+                    if transmission == 0b01110000:
                         break
                     else:
-                        value += transmission																				# Add transmitted value to value
+                        value += transmission
 
-                print_status('Preparing to read received data')
                 value /= 10
-                print('Received data: ', value) 																			# Used for testing remove later
+                print(value)
                 break
-            elif transmission == 0b01010001:																				# Change shutter status to rolled up
-                print_status('Status has been set to 1')
+            elif transmission == 0b01010001:
+                print("Shutter rolled up")
                 self.status = 1
                 break
-            elif transmission == 0b01010000:																				# Change shutter status to rolled down
-                print_status('Status has been set to 0')
+            elif transmission == 0b01010000:
+                print("Shutter rolled down")
                 self.status = 0
                 break
-
+    #OBSOLETE
     def rollUp(self):
-        self.transmit(b'\xff')																								# Prepare device to receive instruction
-        self.transmit(b'\x20')																								# Send rollUp code (0b00100000)
-        self.transmit(b'\x70')
+        self.transmit(0xff)																									# Prepare device to receive instruction
+        self.transmit(0x20)																									# Send rollUp code (0b00100000)
+        self.transmit(0b01110000)																							# End data transmission
 
+    #OBSOLETE
     def rollDown(self):
-        self.transmit(b'\xff')																								# Prepare device to receive instruction
-        self.transmit(b'\x30')																								# Send rollDown code (0b00110000)
-        self.transmit(b'\x70')
+        self.transmit(0xff)																									# Prepare device to receive instruction
+        self.transmit(0x30)																									# Send rollDown code (0b00110000)
+        self.transmit(0b01110000)																							# End data transmission
 
     # GUI display code
+    def getName(self):
+        return self.getName 																								# Returns name of a device
 
     def getStatus(self):
         if self.status == 1:																								# If status of device = 1, then return Rolled Up
@@ -127,6 +116,7 @@ class Device():
     # Add code to send this to Device 																					# Send new value to device
 
     def setRollPercentage(self, percentage):																				# Not working
-        roll = percentage - self.rollPercentage 																			#
-        self.transmit(roll)
+        self.transmit(0xff)
+        self.transmit(0b00100000)
+        self.transmit(percentage)
         self.rollPercentage = percentage
