@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel
+from PyQt5.QtWidgets import QMessageBox, QLabel
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
@@ -446,7 +446,7 @@ class Ui_MainWindow(object):
                 self.showPopup("e", "Error: Duplicate names", "There already is a device with this name.")
                 self.name.setText("")
                 return
-        if portRes == "COM5":
+        try:
             newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)
             self.devices.append(newDevice)
             self.setCurrentDevice(self.devices[0].name)
@@ -455,7 +455,7 @@ class Ui_MainWindow(object):
             self.log.writeInLog("i",
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
-        else:
+        except:
             self.log.writeInLog("w", "Could not add device: " + nameRes)
             self.showPopup("e", "Could not add device!", "An error has occurred")
 

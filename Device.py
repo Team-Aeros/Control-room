@@ -1,7 +1,7 @@
 import serial
 import time
 from threading import Thread
-
+from PyQt5.QtWidgets import QMessageBox
 
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
@@ -39,7 +39,10 @@ class Device():
         try:
             self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.5) 	# Opens port to device.
         except:
-            del self
+            popup = QMessageBox()
+            popup.setIcon(QMessageBox.Critical)
+            popup.setWindowTitle("Error")
+            popup.setText("No device connected to " + self.portNumber)
             #raise ValueError("No device connected")
 
     def transmit(self, message):
