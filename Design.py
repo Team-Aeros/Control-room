@@ -16,6 +16,7 @@ from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
 import random
 import sys
+
 from LogWriter import LogWriter
 
 #Main window
@@ -26,8 +27,15 @@ class Ui_MainWindow(object):
 
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
+        stylsheetFile = "Stylesheet.css"
+        fh = open(stylsheetFile)
+        qstr = str(fh.read())
+        MainWindow.setStyleSheet(qstr)
+
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(918, 645)
+        MainWindow.resize(1000, 650)
+
+
         self.devices = []
         self.currentDevice = None
         self.setupLog()
@@ -35,29 +43,33 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(9, 9, 81, 551))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 90, 650))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setObjectName("buttonBar")
 
-        spacerItem = QtWidgets.QSpacerItem(20, 60, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.verticalLayout.addItem(spacerItem)
 
         self.addADevice = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.addADevice.setObjectName("addADevice")
+        self.addADevice.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.addADevice)
 
         self.Manual = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Manual.setObjectName("Manual")
+        self.Manual.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Manual)
 
         self.Graphs = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Graphs.setObjectName("Graphs")
+        self.Graphs.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Graphs)
 
         self.Settings = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Settings.setObjectName("Settings")
+        self.Settings.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Settings)
 
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -65,13 +77,14 @@ class Ui_MainWindow(object):
 
         self.Info = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Info.setObjectName("Info")
+        self.Info.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Info)
 
         spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem2)
 
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 50))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 0, 910, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -116,7 +129,7 @@ class Ui_MainWindow(object):
         self.fSkyTemp.setObjectName("fSkyTemp")
 
         self.Sky = QtWidgets.QLabel(self.fSkyTemp)
-        self.Sky.setGeometry(QtCore.QRect(10, 20, 71, 16))
+        self.Sky.setGeometry(QtCore.QRect(10, 20, 75, 13))
         self.Sky.setObjectName("Sky")
 
         self.TempUp = QtWidgets.QLabel(self.fSkyTemp)
@@ -137,10 +150,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
-        #self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
-        #self.stackedWidget.move(100,100)
-        #self.stackedWidget.setStyleSheet("background-color: black")
+        self.stackedWidget.setGeometry(QtCore.QRect(90, 50, 910, 600))
 
         #sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -178,14 +188,6 @@ class Ui_MainWindow(object):
             self.devicesBox.addItem(device.name)
             self.devicesBoxGraphs.addItem(device.name)
             self.devicesBoxManual.addItem(device.name)
-
-        #set Rolluik1 and Status1
-        """if len(self.devices) > 0:
-            self.mainGrid.Rolluik1.setText(self.devices[0].name)
-            self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #print(self.stackedWidget.currentIndex())"""
-            #self.minVal.setText(str(self.currentDevice.minVal))
-        #print(self.stackedWidget.currentIndex())
 
     def setSensorType(self, type):
         """if type == "Light":
@@ -284,12 +286,12 @@ class Ui_MainWindow(object):
             goBack = QtWidgets.QPushButton(self.graphWidget)
             goBack.setText("Ok")
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
-            goBack.move(450,400)
+            goBack.move(450, 400)
 
             start = QtWidgets.QPushButton(self.graphWidget)
             start.setText("start")
             start.clicked.connect(self.fillGraph)
-            start.move(450,375)
+            start.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
