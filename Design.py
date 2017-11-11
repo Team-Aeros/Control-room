@@ -3,10 +3,7 @@ from PyQt5.QtWidgets import QMessageBox, QLabel
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
-
 import random
-import sys
-
 from LogWriter import LogWriter
 import sys
 
@@ -24,16 +21,17 @@ class Ui_MainWindow(object):
         stylsheetFile = "Stylesheet.css"
         fh = open(stylsheetFile)
         qstr = str(fh.read())
-        MainWindow.setStyleSheet(qstr)
+        self.MainWindow = mainWindow
+        self.MainWindow.setStyleSheet(qstr)
 
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 650)
-        
+        self.MainWindow.setObjectName("MainWindow")
+        self.MainWindow.resize(1000, 650)
+
         self.devices = []
         self.currentDevice = None
         self.setupLog()
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget = QtWidgets.QWidget(self.MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 90, 650))
@@ -143,15 +141,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-
         self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
         # self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
         # self.stackedWidget.move(100,100)
         # self.stackedWidget.setStyleSheet("background-color: black")
 
-
         # sets up maingrid and adds it to stacked widget
-        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.page0 = QtWidgets.QWidget(self.MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
@@ -167,10 +163,10 @@ class Ui_MainWindow(object):
         self.Graphs.clicked.connect(lambda: self.setIndex(3))
         self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.retranslateUi(MainWindow)
+        self.MainWindow.setCentralWidget(self.centralwidget)
+        self.retranslateUi(self.MainWindow)
 
     def setIndex(self, index):
         try:
@@ -273,7 +269,6 @@ class Ui_MainWindow(object):
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
             goBack.move(450, 400)
 
-
             update = QtWidgets.QPushButton(self.graphWidget)
             update.setText("update")
             update.clicked.connect(self.fillGraph)
@@ -295,10 +290,16 @@ class Ui_MainWindow(object):
         dataList = []
         for i in range(25):
             #print(self.currentDevice.value)
-            if self.currentDevice.value == None:
-                dataList.append(None)
-                if self.sensorType == "light":
-                    dataList.append(random.uniform(0.0, 100.0))
+            if self.currentDevice.value == 0:
+                #dataList.append(None)
+                #print("zero value")
+                try:
+                    if self.currentDevice.sensorType == "Light":
+                        dataList.append(random.uniform(70.0, 100.0))
+                    elif self.currentDevice.sensorType == "Temperature":
+                        dataList.append(random.uniform(20.0, 25.0))
+                except Exception as e:
+                    print(e)
             else:
                 #print("real data: " + str(self.currentDevice.value ))
                 dataList.append(self.currentDevice.value)
@@ -509,8 +510,8 @@ class Ui_MainWindow(object):
     def showInfo(self):
         self.showPopup("i", "Aeros Development", "we made this dashboard")
 
-    def updateMaingrid(self):
-        self.page0.setParent(None)      #Deleting old page0. Garbagecollection doing it's work
+    def updateMaingrid(self, MainWindow):
+        self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
