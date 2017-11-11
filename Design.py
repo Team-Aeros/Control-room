@@ -3,7 +3,10 @@ from PyQt5.QtWidgets import QMessageBox, QLabel
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
-from random import random
+
+import random
+import sys
+
 from LogWriter import LogWriter
 import sys, time
 
@@ -14,11 +17,17 @@ class Ui_MainWindow(object):
         self.log = LogWriter()
         self.log.resetLog()
 
-    # sets up basic ui with buttons: manual, graphs, settings and info
-    def setupUi(self, MainWindow):
-        self.MainWindow = MainWindow
-        self.MainWindow.setObjectName("MainWindow")
-        self.MainWindow.resize(918, 645)
+
+    #sets up basic ui with buttons: manual, graphs, settings and info
+    def setupUi(self, mainWindow):
+        stylsheetFile = "Stylesheet.css"
+        fh = open(stylsheetFile)
+        qstr = str(fh.read())
+        MainWindow.setStyleSheet(qstr)
+
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(1000, 650)
+        
         self.devices = []
         self.currentDevice = None
         self.setupLog()
@@ -26,29 +35,33 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(9, 9, 81, 551))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 90, 650))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setObjectName("buttonBar")
 
-        spacerItem = QtWidgets.QSpacerItem(20, 60, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(20, 50, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.verticalLayout.addItem(spacerItem)
 
         self.addADevice = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.addADevice.setObjectName("addADevice")
+        self.addADevice.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.addADevice)
 
         self.Manual = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Manual.setObjectName("Manual")
+        self.Manual.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Manual)
 
         self.Graphs = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Graphs.setObjectName("Graphs")
+        self.Graphs.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Graphs)
 
         self.Settings = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Settings.setObjectName("Settings")
+        self.Settings.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Settings)
 
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -56,13 +69,14 @@ class Ui_MainWindow(object):
 
         self.Info = QtWidgets.QPushButton(self.verticalLayoutWidget)
         self.Info.setObjectName("Info")
+        self.Info.setFixedSize(90, 90)
         self.verticalLayout.addWidget(self.Info)
 
         spacerItem2 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout.addItem(spacerItem2)
 
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 10, 781, 50))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(90, 0, 910, 50))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -107,7 +121,7 @@ class Ui_MainWindow(object):
         self.fSkyTemp.setObjectName("fSkyTemp")
 
         self.Sky = QtWidgets.QLabel(self.fSkyTemp)
-        self.Sky.setGeometry(QtCore.QRect(10, 20, 71, 16))
+        self.Sky.setGeometry(QtCore.QRect(10, 20, 75, 13))
         self.Sky.setObjectName("Sky")
 
         self.TempUp = QtWidgets.QLabel(self.fSkyTemp)
@@ -128,10 +142,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
+
         self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
         # self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
         # self.stackedWidget.move(100,100)
         # self.stackedWidget.setStyleSheet("background-color: black")
+
 
         # sets up maingrid and adds it to stacked widget
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -255,6 +271,7 @@ class Ui_MainWindow(object):
             goBack.setText("Ok")
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
             goBack.move(450, 400)
+
 
             update = QtWidgets.QPushButton(self.graphWidget)
             update.setText("update")
@@ -501,15 +518,12 @@ class Ui_MainWindow(object):
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
-        # self.Rolluik1.setText(_translate("MainWindow", self.devices[0].getName()))
-        # self.Status1.setText(_translate("MainWindow", "Status: " + self.devices[0].getStatus()))
-
     # Makes popup with info
     def showInfo(self):
         self.showPopup("i", "Aeros Development", "we made this dashboard")
 
-    def updateMaingrid(self, MainWindow):
-        self.page0.setParent(None)
+    def updateMaingrid(self):
+        self.page0.setParent(None)      #Deleting old page0. Garbagecollection doing it's work
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
@@ -524,6 +538,14 @@ class main():
             ui.setupUi(MainWindow)
             MainWindow.show()
             sys.exit(app.exec_())
+
+    def updatestatus(self):
+        for widgetLong in self.devices:
+            widgetName = widgetLong.name
+            widgetStatus = widgetLong.getStatus
+            MainGrid.setStatus(widgetName, widgetStatus)
+
+
 
 
 mainUi = main()

@@ -1,0 +1,8 @@
+QWidget {
+    background: transparent;
+}
+
+QLabel {
+    background-color: transparent;
+    background-image: none;
+}

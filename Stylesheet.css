@@ -1,0 +1,67 @@
+QMainWindow {
+    background-color: lightgray;
+}
+
+QWidget#verticalLayoutWidget {
+    background: qlineargradient(x1:0 y1:0, x2:1 y2:0 , stop:0 darkblue, stop:1 black);
+    border-right-color: black
+}
+
+QWidget #horizontalLayoutWidget {
+    background-color: black;
+    border-left: none;
+}
+
+QStackedWidget {
+    background-image: url("triangular.png");
+}
+
+QPushButton{
+    background-color: darkslategray;
+    color: white;
+}
+
+QPushButton#addADevice,#Manual,#Graphs,#Settings,#Info {
+    border-style: outset;
+    border-right: none;
+    border-left: none;
+    background-image: None;
+    background-color: transparent;
+    border-width: 1px;
+
+    border-color: white;
+    padding: 2px;
+    margin: 0px;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: gray;
+}
+
+QPushButton#addADevice:hover, #Manual:hover, #Graphs:hover, #Settings:hover, #Info:hover {
+    background-color: grey;
+}
+
+QLabel {
+    border: none;
+    color: white;
+    font-size: medium;
+}
+
+QLabel#Logo {
+    background: transparent;
+    Font-size: 32px;
+    margin-left: 10px;
+    color: floralwhite;
+}
+
+QLabel#TempUp, #Sky {
+    background: transparent;
+    color: LightGray;
+}
+
+
+
+
+
