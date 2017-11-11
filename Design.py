@@ -291,13 +291,13 @@ class Ui_MainWindow(object):
         dataList = []
         #print("test5")
         for i in range(25):
-            if self.currentDevice.transmission == None:
+            if self.currentDevice.value == 0:
                 dataList.append(None)
                 if self.sensorType == "light":
                     dataList.append(random.uniform(0.0, 100.0))
             else:
                 #print("real data: " + str(self.currentDevice.transmission))
-                dataList.append(self.currentDevice.transmission)
+                dataList.append(self.currentDevice.value)
         try:
             self.canvas.plot(dataList, self.currentDevice.sensorType)
         except:
