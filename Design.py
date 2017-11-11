@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import QMessageBox, QLabel
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
-import random
-import sys
+from random import random
 from LogWriter import LogWriter
+import sys, time
 
 
 # Main window
@@ -156,48 +156,36 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
     def setIndex(self, index):
-        self.stackedWidget.setCurrentIndex(index)
+        try:
+            self.stackedWidget.setCurrentIndex(index)
 
-        # update devices
-        # empty devicesBox
-        self.devicesBox.clear()
-        self.devicesBoxGraphs.clear()
-        self.devicesBoxManual.clear()
+            # update devices
+            # empty devicesBox
+            self.devicesBox.clear()
+            self.devicesBoxGraphs.clear()
+            self.devicesBoxManual.clear()
 
-        # fill devicesBox
-        for device in self.devices:
-            self.devicesBox.addItem(device.name)
-            self.devicesBoxGraphs.addItem(device.name)
-            self.devicesBoxManual.addItem(device.name)
+            # fill devicesBox
+            for device in self.devices:
+                self.devicesBox.addItem(device.name)
+                self.devicesBoxGraphs.addItem(device.name)
+                self.devicesBoxManual.addItem(device.name)
 
-        # set Rolluik1 and Status1
-        """if len(self.devices) > 0:
-            self.mainGrid.Rolluik1.setText(self.devices[0].name)
-            self.mainGrid.Status1.setText(self.devices[0].getStatus())
-        #print(self.stackedWidget.currentIndex())"""
-        # self.minVal.setText(str(self.currentDevice.minVal))
-        # print(self.stackedWidget.currentIndex())
+            #assign function to startRoll button if a device exist
+            if len(self.devices) > 0:
+                self.startRoll.setDisabled(False)
+                if self.currentDevice.status == 1:
+                    self.startRoll.clicked.connect(lambda: self.rollOut)
+                    self.startRoll.setText("Roll out")
+                elif self.currentDevice.status == 0:
+                    self.startRoll.clicked.connect(lambda: self.rollUp)
+                    self.startRoll.setText("Roll up")
+        except Exception as e:
+            print(e)
 
     def setSensorType(self, type):
-        """if type == "Light":
-            self.temp.setDisabled(True)
-            self.light.setDisabled(False)
-        elif type == "Temperature":
-            self.light.setDisabled(True)
-            self.temp.setDisabled(False)"""
-
         self.sensorType = type
 
-    """def changeMinLight(self, minLight):
-        if self.checkStringForNumber(minLight):
-            #minLigh = int(minLight)
-            self.currentDevice.minLight = int(minLight)
-            print("Light value from " + self.currentDevice.name + " changed to " + minLight)
-    def changeMinTemp(self, minTemp):
-        if self.checkStringForNumber(minTemp):
-            #minTemp = int(minTemp)
-            self.currentDevice.minTemp = int(minTemp)
-            print("Temperature value from " + self.currentDevice.name + " changed to " + minTemp)"""
 
     def changeMinVal(self, minVal):
         if self.checkStringForNumber(minVal):
@@ -228,14 +216,6 @@ class Ui_MainWindow(object):
             # self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
             # self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
             self.minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
-
-            """self.chgMinLight = QtWidgets.QPushButton(self.settingsWindowWidget)
-            self.chgMinLight.setText("Change the min light value")
-            self.chgMinLight.clicked.connect(lambda: self.changeMinLight(self.minLight.text()))
-
-            self.chgMinTemp = QtWidgets.QPushButton(self.settingsWindowWidget)
-            self.chgMinTemp.setText("Change the min temp value")
-            self.chgMinTemp.clicked.connect(lambda: self.changeMinTemp(self.minTemp.text()))"""
 
             chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
             chgMinVal.setText("Change the minimum value")
@@ -276,10 +256,10 @@ class Ui_MainWindow(object):
             goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
             goBack.move(450, 400)
 
-            start = QtWidgets.QPushButton(self.graphWidget)
-            start.setText("start")
-            start.clicked.connect(self.fillGraph)
-            start.move(450, 375)
+            update = QtWidgets.QPushButton(self.graphWidget)
+            update.setText("update")
+            update.clicked.connect(self.fillGraph)
+            update.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
@@ -295,12 +275,31 @@ class Ui_MainWindow(object):
     def fillGraph(self):
         # fill graph
         #data = [random.uniform(0.0, 100.0) for i in range(25)]  # testdata
-        self.currentDevice.receive()
-        data = []
+        #print("test1")
+        #receive = Thread(target=self.currentDevice.receive)
+        #print("test2")
+        #receive.isDaemon(True)
+        #print("test3")
+        #receive.start()
+        #print("test4")
+        """try:
+            self.currentDevice.receive()
+            self.log.writeInLog("i", self.currentDevice.name + " received data")
+        except:
+            self.showPopup("e", "Could not receive data", "There was a problem with the connection")
+            self.log.writeInLog("w", self.currentDevice.name + " could not receive data")"""
+        dataList = []
+        #print("test5")
         for i in range(25):
-            data.append(self.currentDevice.data)
+            if self.currentDevice.transmission == None:
+                dataList.append(None)
+                if self.sensorType == "light":
+                    dataList.append(random.uniform(0.0, 100.0))
+            else:
+                #print("real data: " + str(self.currentDevice.transmission))
+                dataList.append(self.currentDevice.transmission)
         try:
-            self.canvas.plot(data, self.currentDevice.sensorType)
+            self.canvas.plot(dataList, self.currentDevice.sensorType)
         except:
             self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
 
@@ -383,9 +382,10 @@ class Ui_MainWindow(object):
             self.manualWidget = QtWidgets.QWidget(self.page4)
             layout = QtWidgets.QFormLayout(self.manualWidget)
 
-            percentageLabel = QLabel("Give percentage")
-            percentage = QtWidgets.QLineEdit(self.manualWidget)
-            percentage.setText("0")
+            self.startRoll = QtWidgets.QPushButton(self.manualWidget)
+            self.startRoll.setText("Roll out/in")
+            self.startRoll.setDisabled(True)
+
 
             self.devicesBoxManual = QtWidgets.QComboBox(self.manualWidget)
             for device in self.devices:
@@ -396,27 +396,33 @@ class Ui_MainWindow(object):
             ok.setText("Ok")
             ok.setMaximumSize(QtCore.QSize(100, 200))
             ok.clicked.connect(lambda: self.setIndex(0))
-            ok.clicked.connect(lambda: self.rollOut(0))
 
-            layout.addRow(percentageLabel, percentage)
-            layout.addRow(self.devicesBoxManual, ok)
+            layout.addRow(self.devicesBoxManual, self.startRoll)
+            layout.addRow(ok, ok)
 
             self.manualWidget.setLayout(layout)
             self.stackedWidget.addWidget(self.page4)
             self.log.writeInLog("i", "Page 4: manual window created")
-        except:
+        except Exception as e:
+            print(e)
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
-    def rollOut(self, int):
+    def rollOut(self):
+        self.showPopup("i", "Rolling Out!")
+        self.log.writeInLog("i", self.currentDevice.name + " rolled out")
         self.currentDevice.rollDown()
         self.currentDevice.status = 0
-        #print("Placeholder function to roll out the shutter " + str(int))
+
+    def rollUp(self):
+        self.showPopup("i", "Rolling up!")
+        self.log.writeInLog("i", self.currentDevice.name + " rolled up")
+        self.currentDevice.rollUp()
+        self.currentDevice.status = 1
+
 
     def addDeviceNoPar(self):
         nameRes = self.name.text()
         portRes = self.port.text()
-        # lightRes = int(self.light.text())
-        # tempRes = int(self.temp.text())
         if self.checkStringForNumber(self.value.text()):
             valRes = int(self.value.text())
         else:
@@ -432,8 +438,6 @@ class Ui_MainWindow(object):
 
         self.name.setText("")
         self.port.setText("COM0")
-        # self.light.setText("0")
-        # self.temp.setText("0")
         self.value.setText("0")
         self.maxRollLength.setText("0")
 
@@ -483,17 +487,6 @@ class Ui_MainWindow(object):
         for device in self.devices:
             if device.name == name:
                 self.currentDevice = device
-                """if self.currentDevice.sensorType == "Light":
-                    self.minTemp.setDisabled(True)
-                    self.minLight.setDisabled(False)
-                    self.chgMinLight.setDisabled(False)
-                    self.chgMinTemp.setDisabled(True)
-                elif self.currentDevice.sensorType == "Temperature":
-                    self.minTemp.setDisabled(False)
-                    self.minLight.setDisabled(True)
-                    self.chgMinLight.setDisabled(True)
-                    self.chgMinTemp.setDisabled(False)"""
-                # print(type(self.currentDevice))
 
     # sets te text
     def retranslateUi(self, MainWindow):

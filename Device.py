@@ -1,6 +1,6 @@
 import serial
 import time
-
+from threading import Thread
 
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
@@ -13,8 +13,8 @@ class Device():
         self.portNumber = portNumber																						# Port used to connect to device
         self.sensorType = sensorType																						# Type of sensor used in device
         self.maxLength = maxLength																							# Maximun roll distance of the shutter
-        self.rollPercentage = 0																								# Percentage shutter has rolled out. Between 0 and 100
-
+        self.rollPercentage = 0																							# Percentage shutter has rolled out. Between 0 and 100
+        self.transmission = None
         if minVal != 0:																										# If custom value is given use that value
             self.minVal = minVal
         elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
@@ -42,7 +42,17 @@ class Device():
             else:																											# Else send value
                 self.transmit(value)
                 break
-        self.transmit(0b01110000)																							# End data transmission
+        self.transmit(0b01110000)																						    # End data transmission
+
+        time.sleep(1)
+        try:
+            receiving = Thread(target=self.receive)
+            receiving.start()
+            #self.log.writeInLog("i", self.currentDevice.name + " received data")
+        except:
+            #self.showPopup("e", "Could not receive data", "There was a problem with the connection")
+            #self.log.writeInLog("w", self.currentDevice.name + " could not receive data")
+            print("could not receive")
 
     # Connection code
     def establishConnection(self):
@@ -53,41 +63,54 @@ class Device():
 
     def receive(self):
         data = self.connection.read()
-
         if not data:
             return
-
-        transmission = int(ord(data))
+        #print_status('Received message')
+        #print(data)
+        self.transmission = int(ord(data))
+        #print(transmission)
         value = 0
 
-        if transmission != 0xff:
+        if self.transmission != 0xff:
+            #print("return")
             return
+            #pass
 
+        print_status('Transmission received. Sending confirmation...')
+        print('First transmission: ', self.transmission)
         while True:
+            print_status('Preparing to receive multiple transmissions')
             data = self.connection.read()
-            transmission = int(ord(data))
+            #print(data)
+            self.transmission = int(ord(data))
+            #print(self.transmission)
 
-            if transmission == 0b01000000:
+            if self.transmission == 0b01000000:
+                print_status('Transmission received: Arduino is trying to send data')
                 while True:
                     data = self.connection.read()
-                    transmission = int(ord(data))
-
-                    if transmission == 0b01110000:
+                    self.transmission = int(ord(data))
+                    print('Data transmission: ', self.transmission)
+                    if self.transmission == 0b01110000:
+                        print_status('Nothing more to do')
                         break
                     else:
-                        value += transmission
+                        value += self.transmission
 
+                print_status('Preparing to read received data')
                 value /= 10
                 print(value)
                 break
-            elif transmission == 0b01010001:
+            elif self.transmission == 0b01010001:
                 print("Shutter rolled up")
                 self.status = 1
                 break
-            elif transmission == 0b01010000:
+            elif self.transmission == 0b01010000:
                 print("Shutter rolled down")
                 self.status = 0
                 break
+            else:
+                print("nothing")
     #OBSOLETE
     def rollUp(self):
         self.transmit(0xff)																									# Prepare device to receive instruction
@@ -120,3 +143,33 @@ class Device():
         self.transmit(0b00100000)
         self.transmit(percentage)
         self.rollPercentage = percentage
+
+#Test code
+"""
+port = 'COM5'
+try:
+    shutter = Device("Attic", port, "Light", 10, 0.10)
+    print("Connection established on {0}".format(port))
+
+    counter = 0
+    i = 1
+    while True:
+        print_status('Sending empty transmission to Arduino')
+        shutter.transmit(1)
+
+        print_status('begin transmission cycle: {0}'.format(counter))
+        shutter.receive()
+        if i == 1:
+            time.sleep(10)
+            shutter.rollDown()
+            i = 2
+            #shutter.transmit(64)
+            print_status('end')
+
+            #counter += 1
+
+            #time.sleep(5)
+            #shutter.transmit(0xff)
+            print("Rolling down")
+except Exception as e:
+    print(e)"""
