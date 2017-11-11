@@ -1,4 +1,4 @@
-import serial
+"""import serial
 import time
 from threading import Thread
 
@@ -8,41 +8,41 @@ def print_status(msg):
 
 class Device():
     def __init__(self, name, portNumber, sensorType, minVal, maxLength):
-        self.name = name        																							# Custom name of device. For example: Living room
-        self.status = 1																										# 1 = rolled up, 0 = rolled down
-        self.portNumber = portNumber																						# Port used to connect to device
-        self.sensorType = sensorType																						# Type of sensor used in device
-        self.maxLength = maxLength																							# Maximun roll distance of the shutter
-        self.rollPercentage = 0																							# Percentage shutter has rolled out. Between 0 and 100
+        self.name = name        					# Custom name of device. For example: Living room
+        self.status = 1								# 1 = rolled up, 0 = rolled down
+        self.portNumber = portNumber				# Port used to connect to device
+        self.sensorType = sensorType				# Type of sensor used in device
+        self.maxLength = maxLength					# Maximun roll distance of the shutter
+        self.rollPercentage = 0						# Percentage shutter has rolled out. Between 0 and 100
         self.transmission = None
-        if minVal != 0:																										# If custom value is given use that value
+        if minVal != 0:								# If custom value is given use that value
             self.minVal = minVal
-        elif self.sensorType == "Light":																					# If no custom value is given and sensor type = "Light" use default light value
+        elif self.sensorType == "Light":			# If no custom value is given and sensor type = "Light" use default light value
             self.minVal = 50
-        elif self.sensorType == "Temp":																						# If no custom value is given and sensor type = "Temp" use default light value
+        elif self.sensorType == "Temp":				# If no custom value is given and sensor type = "Temp" use default light value
             self.minVal = 22
 
-        self.establishConnection()																							# Establish connection using given port
-        time.sleep(2)																										# Wait to finish establishing connection
+        self.establishConnection()					# Establish connection using given port
+        time.sleep(2)								# Wait to finish establishing connection
 
-        self.transmit(0xff)																									# Start maxLength transmission
-        self.transmit(0b00010001)																							# Send code to set maxLength
-        self.transmit(int(10.0 * self.maxLength))																			# Send maxLength value
-        self.transmit(0b01110000)																							# End data transmission
+        self.transmit(0xff)							# Start maxLength transmission
+        self.transmit(0b00010001)					# Send code to set maxLength
+        self.transmit(int(10.0 * self.maxLength))	# Send maxLength value
+        self.transmit(0b01110000)					# End data transmission
 
-        time.sleep(1)																										# Pause between transmission
+        time.sleep(1)						# Pause between transmission
 
-        self.transmit(0xff)																									# Start minVal transmission
-        self.transmit(0b00010010)																							# Send code to set minVal
-        value = int(10 * self.minVal)																						# Turn float into integer
+        self.transmit(0xff)					# Start minVal transmission
+        self.transmit(0b00010010)			# Send code to set minVal
+        value = int(10 * self.minVal)		# Turn float into integer
         while True:
-            if (value - 255) > 0:																							# If value is larger than 8 bits send 255
+            if (value - 255) > 0:	# If value is larger than 8 bits send 255
                 self.transmit(255)
-                value -= 255																								# Subtract 255 from value
-            else:																											# Else send value
+                value -= 255		# Subtract 255 from value
+            else:                   # Else send value
                 self.transmit(value)
                 break
-        self.transmit(0b01110000)	                                                                # End data transmission
+        self.transmit(0b01110000)   # End data transmission
 
         try:
             receiving = Thread(target=self.receive)
@@ -56,7 +56,8 @@ class Device():
         self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE) 	# Opens port to device.
 
     def transmit(self, message):
-        self.connection.write(bytes([message]))																				# Send message to device, Can use decimal, binary
+        #self.connection.write(bytes([message])) # Send message to device, Can use decimal, binary
+        self.connection.write(message)
 
     def receive(self):
         data = self.connection.read()
@@ -108,6 +109,20 @@ class Device():
                 break
             else:
                 print("nothing")
+
+    def receive(self):
+        data = self.connection.read()
+        # print("data:" + str(data))
+
+        if not data:
+            return
+
+        self.transmission = int(ord(data))
+
+        if self.transmission == 0xFF or self.transmission == 0b01110000 or self.transmission == 64:
+            return
+
+            # print("transmission: " + str(transmission))
     #OBSOLETE
     def rollUp(self):
         self.transmit(0xff)																									# Prepare device to receive instruction
@@ -139,11 +154,10 @@ class Device():
         self.transmit(0xff)
         self.transmit(0b00100000)
         self.transmit(percentage)
-        self.rollPercentage = percentage
+        self.rollPercentage = percentage"""
 
 #Test code
-"""
-port = 'COM5'
+"""port = 'COM5'
 try:
     shutter = Device("Attic", port, "Light", 10, 0.10)
     print("Connection established on {0}".format(port))
@@ -168,5 +182,68 @@ try:
             #time.sleep(5)
             #shutter.transmit(0xff)
             print("Rolling down")
+except Exception as e:
+    print(e)"""
+
+
+import serial
+import time
+
+class Device():
+    def __init__(self, name, portNumber, sensorType, minVal, maxLength):
+        self.name = name                                                                                                    # Custom name of device. For example: Living room
+        self.status = 1                                                                                                     # 1 = rolled up, 0 = rolled down
+        self.portNumber = portNumber                                                                                        # Port used to connect to device
+        self.sensorType = sensorType                                                                                        # Type of sensor used in device
+        self.maxLength = maxLength                                                                                          # Maximun roll distance of the shutter
+        self.rollPercentage = 0                                                                                             # Percentage shutter has rolled out. Between 0 and 100
+
+        if minVal != 0:                                                                                                     # If custom value is given use that value
+            self.minVal = minVal
+        elif self.sensorType == "Light":                                                                                    # If no custom value is given and sensor type = "Light" use default light value
+            self.minVal = 50
+        elif self.sensorType == "Temp":                                                                                     # If no custom value is given and sensor type = "Temp" use default light value
+            self.minVal = 22
+
+        self.establishConnection()                                                                                          # Establish connection using given port
+        # Send settings to arduino
+
+    # Connection code
+    def establishConnection(self):
+        self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, timeout=0.2)     # Opens port to device.
+
+    def transmit(self, message):
+        self.connection.write(message)
+
+    def getStatus(self):
+        if self.status == 1:  # If status of device = 1, then return Rolled Up
+            return "Rolled up"
+        elif self.status == 0:  # If status of device = 0, then return Rolled Down
+            return "Rolled down"
+
+    def receive(self):
+        data = self.connection.read()
+
+        if not data:
+            return
+
+        transmission = int(ord(data))
+
+        if transmission == 0xFF or transmission == 0b01110000 or transmission == 64:
+            return
+
+        print(transmission)
+
+# Test code
+"""port = 'COM5'
+
+try:
+    shutter = Device("Attic", port, "Light", 0, 1.50)
+    print("Connection established on {0}".format(port))
+
+    while True:
+        shutter.transmit(0b00000001)
+        shutter.receive()
+
 except Exception as e:
     print(e)"""

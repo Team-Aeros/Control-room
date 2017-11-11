@@ -18,8 +18,8 @@ class Ui_MainWindow(object):
 
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
-        stylsheetFile = "Stylesheet.css"
-        fh = open(stylsheetFile)
+        stylesheetFile = "Stylesheet.css"
+        fh = open(stylesheetFile)
         qstr = str(fh.read())
         self.MainWindow = mainWindow
         self.MainWindow.setStyleSheet(qstr)
@@ -141,7 +141,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addItem(spacerItem4)
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
+        self.stackedWidget.setGeometry(QtCore.QRect(90, 50, 910, 600))
         # self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
         # self.stackedWidget.move(100,100)
         # self.stackedWidget.setStyleSheet("background-color: black")
@@ -289,8 +289,10 @@ class Ui_MainWindow(object):
         # fill graph
         dataList = []
         for i in range(25):
+            self.currentDevice.transmit(0b00000001)
+            self.currentDevice.receive()
             #print(self.currentDevice.value)
-            if self.currentDevice.value == 0:
+            if self.currentDevice.transmission == 0:
                 #dataList.append(None)
                 #print("zero value")
                 try:
@@ -302,7 +304,7 @@ class Ui_MainWindow(object):
                     print(e)
             else:
                 #print("real data: " + str(self.currentDevice.value ))
-                dataList.append(self.currentDevice.value)
+                dataList.append(self.currentDevice.transmission)
         try:
             self.canvas.plot(dataList, self.currentDevice.sensorType)
         except:
@@ -417,23 +419,38 @@ class Ui_MainWindow(object):
         self.log.writeInLog("i", self.currentDevice.name + " rolled out")
         self.currentDevice.rollDown()
         self.currentDevice.status = 0
+        self.updateMaingrid(self.MainWindow)
 
     def rollUp(self):
         self.showPopup("i", "Rolling up!")
         self.log.writeInLog("i", self.currentDevice.name + " rolled up")
         self.currentDevice.rollUp()
         self.currentDevice.status = 1
+        self.updateMaingrid(self.MainWindow)
 
 
     def addDeviceNoPar(self):
-        nameRes = self.name.text()
-        portRes = self.port.text()
+        if not self.checkStringForNumber(self.name.text()):
+            nameRes = self.name.text()
+        else:
+            self.showPopup("e", "Not a valid name!", "name has to be text")
+            self.name.setText("")
+            return
+
+        if "COM" in self.port.text():
+            portRes = self.port.text()
+        else:
+            self.showPopup("e", "Not a valid port!", "Port has to be COM + number")
+            self.port.setText("COM0")
+            return
+
         if self.checkStringForNumber(self.value.text()):
             valRes = int(self.value.text())
         else:
             self.showPopup("e", "Not a number", "You have to enter a valid number")
             self.value.setText("0")
             return
+
         try:
             maxRollRes = float(self.maxRollLength.text())
         except:
@@ -464,7 +481,10 @@ class Ui_MainWindow(object):
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
             self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
-            self.updateMaingrid(self.MainWindow)
+            try:
+                self.updateMaingrid(self.MainWindow)
+            except Exception as e:
+                print(e)
         except:
             self.log.writeInLog("w", "Could not add device: " + nameRes)
             self.showPopup("e", "Could not add device!", "An error has occurred")
