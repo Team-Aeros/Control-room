@@ -20,19 +20,20 @@ class Ui_MainWindow(object):
 
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
-        stylsheetFile = "Stylesheet.css"
-        fh = open(stylsheetFile)
+        self.MainWindow = mainWindow
+        stylesheetFile = "Stylesheet.css"
+        fh = open(stylesheetFile)
         qstr = str(fh.read())
-        MainWindow.setStyleSheet(qstr)
+        self.MainWindow.setStyleSheet(qstr)
 
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 650)
+        self.MainWindow.setObjectName("MainWindow")
+        self.MainWindow.resize(1000, 650)
         
         self.devices = []
         self.currentDevice = None
         self.setupLog()
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget = QtWidgets.QWidget(self.MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 90, 650))
@@ -143,14 +144,14 @@ class Ui_MainWindow(object):
 
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
 
-        self.stackedWidget.setGeometry(QtCore.QRect(90, 60, 800, 540))
+        self.stackedWidget.setGeometry(QtCore.QRect(90, 50, 910, 600))
         # self.stackedWidget.setMinimumSize(QtCore.QSize(600, 600)) #400, 400
         # self.stackedWidget.move(100,100)
         # self.stackedWidget.setStyleSheet("background-color: black")
 
 
         # sets up maingrid and adds it to stacked widget
-        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.page0 = QtWidgets.QWidget(self.MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
@@ -166,10 +167,10 @@ class Ui_MainWindow(object):
         self.Graphs.clicked.connect(lambda: self.setIndex(3))
         self.Settings.clicked.connect(lambda: self.setIndex(1))
         self.Info.clicked.connect(self.showInfo)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.retranslateUi(MainWindow)
+        self.MainWindow.setCentralWidget(self.centralwidget)
+        self.retranslateUi(self.MainWindow)
 
     def setIndex(self, index):
         try:
@@ -508,7 +509,7 @@ class Ui_MainWindow(object):
     # sets te text
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.addADevice.setText(_translate("MainWindow", "Add a Device"))
         self.Manual.setText(_translate("MainWindow", "Manual"))
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
@@ -524,7 +525,7 @@ class Ui_MainWindow(object):
 
     def updateMaingrid(self):
         self.page0.setParent(None)      #Deleting old page0. Garbagecollection doing it's work
-        self.page0 = QtWidgets.QWidget(MainWindow)
+        self.page0 = QtWidgets.QWidget(self.MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
 
@@ -533,10 +534,10 @@ class main():
     def __init__(self):
         if __name__ == "__main__":
             app = QtWidgets.QApplication(sys.argv)
-            MainWindow = QtWidgets.QMainWindow()
+            self.MainWindow = QtWidgets.QMainWindow()
             ui = Ui_MainWindow()
-            ui.setupUi(MainWindow)
-            MainWindow.show()
+            ui.setupUi(self.MainWindow)
+            self.MainWindow.show()
             sys.exit(app.exec_())
 
     def updatestatus(self):
@@ -544,8 +545,5 @@ class main():
             widgetName = widgetLong.name
             widgetStatus = widgetLong.getStatus
             MainGrid.setStatus(widgetName, widgetStatus)
-
-
-
 
 mainUi = main()
