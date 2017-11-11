@@ -8,7 +8,8 @@ import random
 import sys
 
 from LogWriter import LogWriter
-import sys, time
+import sys
+
 
 
 # Main window
@@ -291,29 +292,15 @@ class Ui_MainWindow(object):
 
     def fillGraph(self):
         # fill graph
-        #data = [random.uniform(0.0, 100.0) for i in range(25)]  # testdata
-        #print("test1")
-        #receive = Thread(target=self.currentDevice.receive)
-        #print("test2")
-        #receive.isDaemon(True)
-        #print("test3")
-        #receive.start()
-        #print("test4")
-        """try:
-            self.currentDevice.receive()
-            self.log.writeInLog("i", self.currentDevice.name + " received data")
-        except:
-            self.showPopup("e", "Could not receive data", "There was a problem with the connection")
-            self.log.writeInLog("w", self.currentDevice.name + " could not receive data")"""
         dataList = []
-        #print("test5")
         for i in range(25):
-            if self.currentDevice.value == 0:
+            #print(self.currentDevice.value)
+            if self.currentDevice.value == None:
                 dataList.append(None)
                 if self.sensorType == "light":
                     dataList.append(random.uniform(0.0, 100.0))
             else:
-                #print("real data: " + str(self.currentDevice.transmission))
+                #print("real data: " + str(self.currentDevice.value ))
                 dataList.append(self.currentDevice.value)
         try:
             self.canvas.plot(dataList, self.currentDevice.sensorType)
