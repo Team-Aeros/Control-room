@@ -42,6 +42,7 @@ class MainGrid():
             sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,
                                                QtWidgets.QSizePolicy.Maximum)
 
+
             self.rolluikWidget[WidgetDevice].setSizePolicy(sizePolicy)
             self.rolluikWidget[WidgetDevice].setMinimumSize(QtCore.QSize(250, 170))
             self.rolluikWidget[WidgetDevice].setMaximumSize(QtCore.QSize(250, 170))
@@ -81,6 +82,7 @@ class MainGrid():
 
             self.rolluik[WidgetDevice].raise_()
             self.status[WidgetDevice].raise_()
+
 
             self.x += 1
             if (self.x%self.maxXvalue == 0):
