@@ -294,39 +294,41 @@ class Ui_MainWindow(object):
             self.log.writeInLog("w", "Could not create page 3: graphs window")
 
     def fillGraph(self):
-        try:
-            dataList = []
-            # fill graph
-            #print("test1")
-            #print("test2")
-            #print(self.currentDevice.queue.get())
-            transmis = None
-            q = self.currentDevice.getQueue()
+        dataList = []
+        for i in range(10):
             try:
-                transmis = q.get(True, 2)
+                # fill graph
+                #print("test1")
+                #print("test2")
+                #print(self.currentDevice.queue.get())
+                transmis = None
+                q = self.currentDevice.getQueue()
+                try:
+                    #transmis = q.get(True, 2)
+                    pass
+                except Exception as e:
+                    print(e)
+                if transmis == None:
+                    print("no data, generating test data")
+                    if self.currentDevice.sensorType == "Light":
+                        dataList.append(random.uniform(50,100))
+                    elif self.currentDevice.sensorType == "Temperature":
+                        dataList.append(random.uniform(20,25))
+                else:
+                    #print("test5")
+                    print("real data: " + str(transmis))
+                    self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
+                    dataList.append(transmis)
+                    #time.sleep(1)
+                try:
+                    #print("test6")
+                    self.canvas.plot(dataList, self.currentDevice.sensorType)
+                    #time.sleep(1)
+                except Exception as e:
+                    print(e)
+                    self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
             except Exception as e:
                 print(e)
-            if transmis == None:
-                print("no data")
-                if self.currentDevice.sensorType == "Light":
-                    dataList.append(random.uniform(50,100))
-                elif self.currentDevice.sensorType == "Temperature":
-                    dataList.append(random.uniform(20,25))
-            else:
-                #print("test5")
-                print("real data: " + str(transmis))
-                self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
-                dataList.append(transmis)
-                #time.sleep(1)
-            try:
-                #print("test6")
-                self.canvas.plot(dataList, self.currentDevice.sensorType)
-                #time.sleep(1)
-            except Exception as e:
-                print(e)
-                self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
-        except Exception as e:
-            print(e)
 
     def setupEnterDevice(self):
         try:

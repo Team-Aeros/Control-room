@@ -1,6 +1,7 @@
 import serial
 import time
 from queue import Queue
+from PlotCanvas import PlotCanvas
 
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
@@ -48,6 +49,9 @@ class Device():
 
         time.sleep(1)
 
+        #test code
+        self.canvas = PlotCanvas()
+
     # Connection code
     def establishConnection(self):
         self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE,
@@ -58,7 +62,6 @@ class Device():
 
     def receive(self):
         data = self.connection.read()
-
         if not data:
             return
 
@@ -70,24 +73,21 @@ class Device():
         while True:
             data = self.connection.read()
             transmission = int(ord(data))
-
             if transmission == 0b01000000:
                 while True:
                     data = self.connection.read()
                     transmission = int(ord(data))
-
                     if transmission == 0b01110000:
                         break
                     else:
                         self.value += transmission
-
                 self.value /= 10
                 #print(data)
                 #print(transmission)
                 #print(value)
                 self.queue.put(self.value)
                 print(round(self.queue.get(),2))
-                break
+
             elif transmission == 0b01010001:
                 print("Shutter rolled up")
                 self.status = 1
@@ -96,6 +96,7 @@ class Device():
                 print("Shutter rolled down")
                 self.status = 0
                 break
+
 
     # OBSOLETE
     def rollUp(self):
@@ -136,13 +137,15 @@ class Device():
 
 
 # Test code
-"""port = 'COM5'
+port = 'COM5'
 try:
     q = Queue()
     shutter = Device("Attic", port, "Light", 70, 0.10, q)
     print("Connection established on {0}".format(port))
+
     while True:
         shutter.transmit(1)
         shutter.receive()
+
 except Exception as e:
-    print(e)"""
+    print(e)
