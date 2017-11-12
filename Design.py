@@ -547,8 +547,8 @@ class Ui_MainWindow(object):
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
         self.Settings.setText(_translate("MainWindow", "Settings"))
         self.Info.setText(_translate("MainWindow", "Info"))
-        self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
-        self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
+        self.Sky.setText(_translate("MainWindow", "Sky:  "))
+        self.TempUp.setText(_translate("MainWindow", "Temp: "))
 
     # Makes popup with info
     def showInfo(self):
@@ -570,11 +570,5 @@ class main():
             ui.setupUi(MainWindow)
             MainWindow.show()
             sys.exit(app.exec_())
-
-    def updatestatus(self):
-        for widgetLong in self.devices:
-            widgetName = widgetLong.name
-            widgetStatus = widgetLong.getStatus
-            MainGrid.setStatus(widgetName, widgetStatus)
 
 mainUi = main()

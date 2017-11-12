@@ -137,7 +137,7 @@ class Device():
 
 
 # Test code
-port = 'COM5'
+"""port = 'COM5'
 try:
     q = Queue()
     shutter = Device("Attic", port, "Light", 70, 0.10, q)
@@ -148,4 +148,4 @@ try:
         shutter.receive()
 
 except Exception as e:
-    print(e)
+    print(e)"""
