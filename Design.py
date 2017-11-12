@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QLabel
+from PyQt5.QtGui import QPixmap
 from Device import Device
 from Maingrid import MainGrid
 from PlotCanvas import PlotCanvas
@@ -96,7 +97,7 @@ class Ui_MainWindow(object):
 
         self.Logo.setSizePolicy(sizePolicy)
         self.Logo.setMinimumSize(QtCore.QSize(0, 0))
-        self.Logo.setMaximumSize(QtCore.QSize(300, 30))
+        self.Logo.setMaximumSize(QtCore.QSize(300, 50))
 
         font = QtGui.QFont()
         font.setFamily("Calibri")
@@ -108,6 +109,8 @@ class Ui_MainWindow(object):
         self.Logo.setFrameShape(QtWidgets.QFrame.Box)
         self.Logo.setFrameShadow(QtWidgets.QFrame.Raised)
         self.Logo.setObjectName("Logo")
+        pic = QPixmap('rsz_1aerosdev')
+        self.Logo.setPixmap(pic)
         self.horizontalLayout_2.addWidget(self.Logo)
 
         spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -298,13 +301,17 @@ class Ui_MainWindow(object):
             #print("test2")
             #print(self.currentDevice.queue.get())
             transmis = None
+            q = self.currentDevice.getQueue()
             try:
-                transmis = self.currentDevice.queue.get(True, 10)
+                transmis = q.get(True, 2)
             except Exception as e:
                 print(e)
             if transmis == None:
                 print("no data")
-                pass
+                if self.currentDevice.sensorType == "Light":
+                    dataList.append(random.uniform(50,100))
+                elif self.currentDevice.sensorType == "Temperature":
+                    dataList.append(random.uniform(20,25))
             else:
                 #print("test5")
                 print("real data: " + str(transmis))
@@ -538,7 +545,6 @@ class Ui_MainWindow(object):
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
         self.Settings.setText(_translate("MainWindow", "Settings"))
         self.Info.setText(_translate("MainWindow", "Info"))
-        self.Logo.setText(_translate("MainWindow", "Aeros Development"))
         self.Sky.setText(_translate("MainWindow", "Sky:  Sunny"))
         self.TempUp.setText(_translate("MainWindow", "Temp: 30C"))
 
