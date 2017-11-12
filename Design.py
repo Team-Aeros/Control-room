@@ -25,21 +25,25 @@ class Ui_MainWindow(object):
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
 
-        stylesheetFile = "Stylesheet.css"
+        stylesheetFile = "Stylesheet.css"       #styling
         fh = open(stylesheetFile)
         qstr = str(fh.read())
-        self.MainWindow = mainWindow
+
+        self.MainWindow = mainWindow            #assign mainwindow
         self.MainWindow.setStyleSheet(qstr)
 
         self.MainWindow.setObjectName("MainWindow")
         self.MainWindow.resize(1000, 650)
 
+        #setup basic variables
         self.devices = []
         self.currentDevice = None
         self.setupLog()
         self.mainQueue = Queue()
-        self.lang = Language()
+        self.lang = Language(0)
 
+
+        #fill mainwindow
         self.centralwidget = QtWidgets.QWidget(self.MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -162,13 +166,16 @@ class Ui_MainWindow(object):
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
+        #sets up pages
         self.setupSettingsWindow()
         self.setupEnterDevice()
         self.setupGraphsWindow()
         self.setupManual()
 
+        #sets starting page
         self.stackedWidget.setCurrentIndex(0)
 
+        #binds functions to mainwindow buttons
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
         self.Manual.clicked.connect(lambda: self.setIndex(4))
         self.Graphs.clicked.connect(lambda: self.setIndex(3))
@@ -177,7 +184,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
         self.MainWindow.setCentralWidget(self.centralwidget)
-        self.retranslateUi(self.MainWindow)
+        self.retranslateUi(self.MainWindow, 0)
 
     def setIndex(self, index):
         try:
@@ -200,10 +207,10 @@ class Ui_MainWindow(object):
                 self.startRoll.setDisabled(False)
                 if self.currentDevice.status == 1:
                     self.startRoll.clicked.connect(lambda: self.rollOut)
-                    self.startRoll.setText("Roll out")
+                    self.startRoll.setText(self.lang.but_StartRollOut)
                 elif self.currentDevice.status == 0:
                     self.startRoll.clicked.connect(lambda: self.rollUp)
-                    self.startRoll.setText("Roll up")
+                    self.startRoll.setText(self.lang.but_startRollUp)
         except Exception as e:
             print(e)
 
@@ -242,32 +249,42 @@ class Ui_MainWindow(object):
             self.minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
             self.minVal.setText("0")
 
-            chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
-            chgMinVal.setText(self.lang.but_ChgMinVal)
-            chgMinVal.clicked.connect(lambda: self.changeMinVal(self.minVal.text()))
+            self.chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
+            self.chgMinVal.setText(self.lang.but_ChgMinVal)
+            self.chgMinVal.clicked.connect(lambda: self.changeMinVal(self.minVal.text()))
 
-            goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
-            goBack.setText(self.lang.but_Ok)
-            goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
+            self.goBack.setText(self.lang.but_Ok)
+            self.goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
             self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
             for device in self.devices:
                 self.devicesBox.addItem(device.name)
             self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
+            self.languageBox = QtWidgets.QComboBox(self.settingsWindowWidget)
+            self.languageBox.addItem("English")
+                #could add more languages
+            self.languageBox.activated[str].connect(self.changeLanguage)
+
             layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minVal)
             # layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
-            layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinVal)
+            layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinVal)
             # layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
-            layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
+            layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
             layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
+            layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.languageBox)
 
             # self.stackedWidget.insertWidget(1,self.page_1)
             self.stackedWidget.addWidget(self.page1)
             self.log.writeInLog("i", "Page 1: settings window created")
-        except:
+        except Exception as e:
+            print(e)
             self.log.writeInLog("w", "Could not create page 1: settings window")
 
+    def changeLanguage(self, lang):
+        if lang == "English":
+            self.retranslateUi(self.MainWindow, 0)
     def setupGraphsWindow(self):
         try:
             self.page3 = QtWidgets.QWidget()
@@ -276,15 +293,15 @@ class Ui_MainWindow(object):
             self.graphWidget.setMinimumSize(QtCore.QSize(600, 600))
             self.canvas = PlotCanvas(self.graphWidget)
 
-            goBack = QtWidgets.QPushButton(self.graphWidget)
-            goBack.setText(self.lang.but_Ok)
-            goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
-            goBack.move(450, 400)
+            self.goBack2 = QtWidgets.QPushButton(self.graphWidget)
+            self.goBack2.setText(self.lang.but_Ok)
+            self.goBack2.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack2.move(450, 400)
 
-            update = QtWidgets.QPushButton(self.graphWidget)
-            update.setText(self.lang.but_Update)
-            update.clicked.connect(self.fillGraph)
-            update.move(450, 375)
+            self.update = QtWidgets.QPushButton(self.graphWidget)
+            self.update.setText(self.lang.but_Update)
+            self.update.clicked.connect(self.fillGraph)
+            self.update.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
@@ -370,21 +387,21 @@ class Ui_MainWindow(object):
             self.maxRollLength.setMaximumSize(QtCore.QSize(100, 200))
             self.port.setMaximumSize(QtCore.QSize(100, 200))
 
-            sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
-            sensor.addItem(self.lang.selBox_light)
-            sensor.addItem(self.lang.selBox_temp)
-            sensor.setMaximumSize(QtCore.QSize(100, 200))
-            sensor.activated[str].connect(self.setSensorType)
+            self.sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
+            self.sensor.addItem(self.lang.selBox_light)
+            self.sensor.addItem(self.lang.selBox_temp)
+            self.sensor.setMaximumSize(QtCore.QSize(100, 200))
+            self.sensor.activated[str].connect(self.setSensorType)
 
-            addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
-            addDevice.setText(self.lang.but_AddDevice)
-            addDevice.setMaximumSize(QtCore.QSize(100, 300))
-            addDevice.clicked.connect(self.addDeviceNoPar)
+            self.addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
+            self.addDevice.setText(self.lang.but_AddDevice)
+            self.addDevice.setMaximumSize(QtCore.QSize(100, 300))
+            self.addDevice.clicked.connect(self.addDeviceNoPar)
 
-            goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
-            goBack.setText(self.lang.but_Ok)
-            goBack.setMaximumSize(QtCore.QSize(100, 200))
-            goBack.clicked.connect(lambda: self.setIndex(0))
+            self.goBack3 = QtWidgets.QPushButton(self.enterDeviceWidget)
+            self.goBack3.setText(self.lang.but_Ok)
+            self.goBack3.setMaximumSize(QtCore.QSize(100, 200))
+            self.goBack3.clicked.connect(lambda: self.setIndex(0))
 
             layout.addRow(namelabel, self.name)
             # layout.addRow(lightlabel, self.light)
@@ -392,8 +409,8 @@ class Ui_MainWindow(object):
             layout.addRow(valuelabel, self.value)
             layout.addRow(maxRollLengthLabel, self.maxRollLength)
             layout.addRow(portlabel, self.port)
-            layout.addRow(sensorlabel, sensor)
-            layout.addRow(addDevice, goBack)
+            layout.addRow(sensorlabel, self.sensor)
+            layout.addRow(self.addDevice, self.goBack3)
             # self.stackedWidget.insertWidget(2,self.page_2)
 
             self.setSensorType("Light")
@@ -420,13 +437,13 @@ class Ui_MainWindow(object):
                 self.devicesBoxManual.addItem(device.name)
             self.devicesBoxManual.activated[str].connect(self.setCurrentDevice)
 
-            ok = QtWidgets.QPushButton(self.manualWidget)
-            ok.setText(self.lang.but_Ok)
-            ok.setMaximumSize(QtCore.QSize(100, 200))
-            ok.clicked.connect(lambda: self.setIndex(0))
+            self.ok = QtWidgets.QPushButton(self.manualWidget)
+            self.ok.setText(self.lang.but_Ok)
+            self.ok.setMaximumSize(QtCore.QSize(100, 200))
+            self.ok.clicked.connect(lambda: self.setIndex(0))
 
             layout.addRow(self.devicesBoxManual, self.startRoll)
-            layout.addRow(ok, ok)
+            layout.addRow(self.ok, self.ok)
 
             self.manualWidget.setLayout(layout)
             self.stackedWidget.addWidget(self.page4)
@@ -540,7 +557,9 @@ class Ui_MainWindow(object):
                 self.currentDevice = device
 
     # sets te text
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, MainWindow, type):
+        # choose language
+        self.lang = Language(type)
         _translate = QtCore.QCoreApplication.translate
         self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.addADevice.setText(_translate("MainWindow", self.lang.but_AddADevice))
@@ -550,6 +569,19 @@ class Ui_MainWindow(object):
         self.Info.setText(_translate("MainWindow", self.lang.but_Info))
         self.Sky.setText(_translate("MainWindow", self.lang.lab_Sky))
         self.TempUp.setText(_translate("MainWindow", self.lang.lab_Temp))
+        self.startRoll.setText("Roll out")
+        self.startRoll.setText("Roll up")
+        self.goBack.setText(self.lang.but_Ok)
+        self.chgMinVal.setText(self.lang.but_ChgMinVal)
+        self.goBack2.setText(self.lang.but_Ok)
+        self.update.setText(self.lang.but_Update)
+        self.addDevice.setText(self.lang.but_AddDevice)
+        self.sensor.clear()
+        self.sensor.addItem(self.lang.selBox_light)
+        self.sensor.addItem(self.lang.selBox_temp)
+        self.goBack3.setText(self.lang.but_Ok)
+        self.startRoll.setText(self.lang.but_StartRoll)
+        self.ok.setText(self.lang.but_Ok)
 
     # Makes popup with info
     def showInfo(self):

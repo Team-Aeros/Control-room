@@ -1,6 +1,7 @@
 class Language():
-    def __init__(self):
-        self.load_english()
+    def __init__(self, type):
+        if type == 0:
+            self.load_english()
 
     def load_english(self):
         #naming: first part says what type of text it is, but is for button, lab for label, pop for popup
@@ -17,7 +18,9 @@ class Language():
         self.selBox_temp = "Temperature"
 
         self.but_Manual = "Manual"
-        self.but_StartRoll = "Roll out/in"
+        self.but_StartRoll = "Roll out/up"
+        self.but_StartRollOut = "Roll out"
+        self.but_startRollUp = "Roll up"
 
         self.but_Graphs = "Graphs"
 
