@@ -23,6 +23,7 @@ class Ui_MainWindow(object):
 
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
+
         stylesheetFile = "Stylesheet.css"
         fh = open(stylesheetFile)
         qstr = str(fh.read())
@@ -541,7 +542,7 @@ class Ui_MainWindow(object):
     # sets te text
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.addADevice.setText(_translate("MainWindow", "Add a Device"))
         self.Manual.setText(_translate("MainWindow", "Manual"))
         self.Graphs.setText(_translate("MainWindow", "Graphs"))
@@ -554,6 +555,7 @@ class Ui_MainWindow(object):
     def showInfo(self):
         self.showPopup("i", "Aeros Development", "we made this dashboard")
 
+
     def updateMaingrid(self, MainWindow):
         self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
@@ -565,10 +567,10 @@ class main():
     def __init__(self):
         if __name__ == "__main__":
             app = QtWidgets.QApplication(sys.argv)
-            MainWindow = QtWidgets.QMainWindow()
+            self.MainWindow = QtWidgets.QMainWindow()
             ui = Ui_MainWindow()
-            ui.setupUi(MainWindow)
-            MainWindow.show()
+            ui.setupUi(self.MainWindow)
+            self.MainWindow.show()
             sys.exit(app.exec_())
 
 mainUi = main()
