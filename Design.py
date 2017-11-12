@@ -6,6 +6,10 @@ from PlotCanvas import PlotCanvas
 import random
 from LogWriter import LogWriter
 import sys
+import time
+from threading import Thread
+import threading
+from queue import Queue
 
 
 
@@ -30,6 +34,7 @@ class Ui_MainWindow(object):
         self.devices = []
         self.currentDevice = None
         self.setupLog()
+        self.mainQueue = Queue()
 
         self.centralwidget = QtWidgets.QWidget(self.MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -286,29 +291,35 @@ class Ui_MainWindow(object):
             self.log.writeInLog("w", "Could not create page 3: graphs window")
 
     def fillGraph(self):
-        # fill graph
-        dataList = []
-        for i in range(25):
-            self.currentDevice.transmit(0b00000001)
-            self.currentDevice.receive()
-            #print(self.currentDevice.value)
-            if self.currentDevice.transmission == 0:
-                #dataList.append(None)
-                #print("zero value")
-                try:
-                    if self.currentDevice.sensorType == "Light":
-                        dataList.append(random.uniform(70.0, 100.0))
-                    elif self.currentDevice.sensorType == "Temperature":
-                        dataList.append(random.uniform(20.0, 25.0))
-                except Exception as e:
-                    print(e)
-            else:
-                #print("real data: " + str(self.currentDevice.value ))
-                dataList.append(self.currentDevice.transmission)
         try:
-            self.canvas.plot(dataList, self.currentDevice.sensorType)
-        except:
-            self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
+            dataList = []
+            # fill graph
+            #print("test1")
+            #print("test2")
+            #print(self.currentDevice.queue.get())
+            transmis = None
+            try:
+                transmis = self.currentDevice.queue.get(True, 10)
+            except Exception as e:
+                print(e)
+            if transmis == None:
+                print("no data")
+                pass
+            else:
+                #print("test5")
+                print("real data: " + str(transmis))
+                self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
+                dataList.append(transmis)
+                #time.sleep(1)
+            try:
+                #print("test6")
+                self.canvas.plot(dataList, self.currentDevice.sensorType)
+                #time.sleep(1)
+            except Exception as e:
+                print(e)
+                self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
+        except Exception as e:
+            print(e)
 
     def setupEnterDevice(self):
         try:
@@ -473,10 +484,15 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return
         try:
-            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)  # lightRes, tempRes)
+            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes, self.mainQueue)  # lightRes, tempRes)
             self.devices.append(newDevice)
             self.setCurrentDevice(self.devices[0].name)
-
+            try:
+                receiving = Thread(target=self.currentDevice.receive)
+                receiving.daemon = True
+                receiving.start()
+            except Exception as e:
+                print(e)
             self.log.writeInLog("i",
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
@@ -485,7 +501,8 @@ class Ui_MainWindow(object):
                 self.updateMaingrid(self.MainWindow)
             except Exception as e:
                 print(e)
-        except:
+        except Exception as e:
+            print(e)
             self.log.writeInLog("w", "Could not add device: " + nameRes)
             self.showPopup("e", "Could not add device!", "An error has occurred")
             newDevice = None
@@ -501,8 +518,7 @@ class Ui_MainWindow(object):
             popup.setIcon(QMessageBox.Information)
             popup.setWindowTitle("Info")
             self.log.writeInLog("i", "Information popup shown: " + popupText + " | " + popupIText)
-        else:
-            print("test")
+
         popup.setText(popupText)
         popup.setInformativeText(popupIText)
 
@@ -552,8 +568,5 @@ class main():
             widgetName = widgetLong.name
             widgetStatus = widgetLong.getStatus
             MainGrid.setStatus(widgetName, widgetStatus)
-
-
-
 
 mainUi = main()
