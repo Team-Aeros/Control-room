@@ -1,7 +1,5 @@
 import serial
 import time
-from queue import Queue
-from PlotCanvas import PlotCanvas
 
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
@@ -49,9 +47,6 @@ class Device():
 
         time.sleep(1)
 
-        #test code
-        self.canvas = PlotCanvas()
-
     # Connection code
     def establishConnection(self):
         self.connection = serial.Serial(self.portNumber, 19200, serial.EIGHTBITS, serial.PARITY_NONE,
@@ -98,13 +93,13 @@ class Device():
                 break
 
 
-    # OBSOLETE
+
     def rollUp(self):
         self.transmit(0xff)  # Prepare device to receive instruction
         self.transmit(0x20)  # Send rollUp code (0b00100000)
         self.transmit(0b01110000)  # End data transmission
 
-    # OBSOLETE
+
     def rollDown(self):
         self.transmit(0xff)  # Prepare device to receive instruction
         self.transmit(0x30)  # Send rollDown code (0b00110000)
