@@ -208,10 +208,8 @@ class Ui_MainWindow(object):
             if len(self.devices) > 0:
                 self.startRoll.setDisabled(False)
                 if self.currentDevice.status == 1:
-                    self.startRoll.clicked.connect(lambda: self.rollOut)
                     self.startRoll.setText(self.lang.but_StartRollOut)
                 elif self.currentDevice.status == 0:
-                    self.startRoll.clicked.connect(lambda: self.rollUp)
                     self.startRoll.setText(self.lang.but_startRollUp)
             self.updatelabels(self.mainQueue)
 
@@ -362,7 +360,7 @@ class Ui_MainWindow(object):
                         tempData += 10
                         print(tempData)
                         listdata.append(tempData)
-                    else:
+                    elif self.currentDevice.sensorType == "Light":
                         listdata.append(data)
 
             useDataList = listdata[-30:]
@@ -454,6 +452,7 @@ class Ui_MainWindow(object):
 
             self.startRoll = QtWidgets.QPushButton(self.manualWidget)
             self.startRoll.setText(self.lang.but_StartRoll)
+            self.startRoll.clicked.connect(self.rollUpOut)
             self.startRoll.setDisabled(True)
 
 
@@ -477,21 +476,18 @@ class Ui_MainWindow(object):
             print(e)
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
-    #roll out the selected device
-    def rollOut(self):
+    #roll out or up the selected device
+    def rollUpOut(self):
         self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
         self.log.writeInLog("i", self.currentDevice.name + " rolled out")
-        self.currentDevice.rollDown()
-        self.currentDevice.status = 0
+        if self.currentDevice.status == 1:
+            self.currentDevice.rollDown()
+            self.currentDevice.status = 0
+        elif self.currentDevice.status == 0:
+            self.currentDevice.rollUp()
         self.updateMaingrid(self.MainWindow)
 
-    #roll up the selected device
-    def rollUp(self):
-        self.showPopup("i", self.lang.pop_TitleRollUp, self.currentDevice.name + self.lang.pop_TextRollUp)
-        self.log.writeInLog("i", self.currentDevice.name + " rolled up")
-        self.currentDevice.rollUp()
-        self.currentDevice.status = 1
-        self.updateMaingrid(self.MainWindow)
+
 
     #connect to the device and add it to the dashboard
     def addDeviceNoPar(self):
@@ -548,7 +544,7 @@ class Ui_MainWindow(object):
             except Exception as e:
                 print(e)
             self.log.writeInLog("i",
-                                "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
+                                "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.currentDevice.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
             self.showPopup("i", self.lang.pop_TitleNewDevice, self.lang.pop_TextNewDevice_1  + nameRes + self.lang.pop_TextNewDevice_2)
             try:

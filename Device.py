@@ -107,12 +107,14 @@ class Device():
 
     def rollUp(self):
         self.transmit(0xff)  # Prepare device to receive instruction
+        print("test")
         self.transmit(0x20)  # Send rollUp code (0b00100000)
         self.transmit(0b01110000)  # End data transmission
 
 
     def rollDown(self):
         self.transmit(0xff)  # Prepare device to receive instruction
+        print("test")
         self.transmit(0x30)  # Send rollDown code (0b00110000)
         self.transmit(0b01110000)  # End data transmission
 
