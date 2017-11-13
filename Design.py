@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
 
         self.Logo.setSizePolicy(sizePolicy)
         self.Logo.setMinimumSize(QtCore.QSize(0, 0))
-        self.Logo.setMaximumSize(QtCore.QSize(300, 50))
+        self.Logo.setMaximumSize(QtCore.QSize(250, 50))
 
         font = QtGui.QFont()
         font.setFamily("Calibri")
@@ -184,7 +184,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
         self.MainWindow.setCentralWidget(self.centralwidget)
-        self.retranslateUi(self.MainWindow, 0)
+        self.retranslateUi(0)
 
     def setIndex(self, index):
         try:
@@ -214,10 +214,11 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(e)
 
+    #set the selected sensortype
     def setSensorType(self, type):
         self.sensorType = type
 
-
+    #change the minimum value of the current device
     def changeMinVal(self, minVal):
         if self.checkStringForNumber(minVal):
             self.currentDevice.minVal = int(minVal)
@@ -264,6 +265,7 @@ class Ui_MainWindow(object):
 
             self.languageBox = QtWidgets.QComboBox(self.settingsWindowWidget)
             self.languageBox.addItem("English")
+            self.languageBox.addItem("Nederlands")
                 #could add more languages
             self.languageBox.activated[str].connect(self.changeLanguage)
 
@@ -284,7 +286,10 @@ class Ui_MainWindow(object):
 
     def changeLanguage(self, lang):
         if lang == "English":
-            self.retranslateUi(self.MainWindow, 0)
+            self.retranslateUi(0)
+        elif lang == "Nederlands":
+            self.retranslateUi(1)
+
     def setupGraphsWindow(self):
         try:
             self.page3 = QtWidgets.QWidget()
@@ -316,19 +321,20 @@ class Ui_MainWindow(object):
 
     def fillGraph(self):
         dataList = []
-        for i in range(10):
-            try:
-                # fill graph
-                #print("test1")
-                #print("test2")
-                #print(self.currentDevice.queue.get())
-                transmis = None
-                q = self.currentDevice.getQueue()
-                try:
-                    #transmis = q.get(True, 2)
-                    pass
-                except Exception as e:
-                    print(e)
+        try:
+            q = self.currentDevice.getQueue()
+        except:# Exception as e:
+            #print(e)
+            self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
+            return
+        # fill graph
+        #print("test1")
+        #print("test2")
+        #print(self.currentDevice.queue.get())
+        transmis = None
+        try:
+            for i in range(10):
+               #transmis = q.get(True, 2)
                 if transmis == None:
                     if self.currentDevice.sensorType == "Light":
                         dataList.append(random.uniform(50,100))
@@ -337,16 +343,16 @@ class Ui_MainWindow(object):
                 else:
                     self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
                     dataList.append(transmis)
-                    #time.sleep(1)
-                try:
-                    #print("test6")
-                    self.canvas.plot(dataList, self.currentDevice.sensorType)
-                    #time.sleep(1)
-                except Exception as e:
-                    print(e)
-                    self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
-            except Exception as e:
-                print(e)
+                #time.sleep(1)
+        except:
+            pass
+        try:
+            #print("test6")
+            self.canvas.plot(dataList, self.currentDevice.sensorType)
+            #time.sleep(1)
+        except Exception as e:
+            print(e)
+
 
     def setupEnterDevice(self):
         try:
@@ -395,7 +401,7 @@ class Ui_MainWindow(object):
 
             self.addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
             self.addDevice.setText(self.lang.but_AddDevice)
-            self.addDevice.setMaximumSize(QtCore.QSize(100, 300))
+            self.addDevice.setMaximumSize(QtCore.QSize(120, 300))
             self.addDevice.clicked.connect(self.addDeviceNoPar)
 
             self.goBack3 = QtWidgets.QPushButton(self.enterDeviceWidget)
@@ -557,9 +563,9 @@ class Ui_MainWindow(object):
                 self.currentDevice = device
 
     # sets te text
-    def retranslateUi(self, MainWindow, type):
+    def retranslateUi(self, type):
         # choose language
-        self.lang = Language(type)
+        self.lang.setLang(type)
         _translate = QtCore.QCoreApplication.translate
         self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.addADevice.setText(_translate("MainWindow", self.lang.but_AddADevice))
@@ -593,16 +599,3 @@ class Ui_MainWindow(object):
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
-
-
-class main():
-    def __init__(self):
-        if __name__ == "__main__":
-            app = QtWidgets.QApplication(sys.argv)
-            self.MainWindow = QtWidgets.QMainWindow()
-            ui = Ui_MainWindow()
-            ui.setupUi(self.MainWindow)
-            self.MainWindow.show()
-            sys.exit(app.exec_())
-
-mainUi = main()
