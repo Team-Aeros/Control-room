@@ -11,6 +11,7 @@ import time
 from threading import Thread
 import threading
 from queue import Queue
+from Language import Language
 
 
 
@@ -24,20 +25,25 @@ class Ui_MainWindow(object):
     #sets up basic ui with buttons: manual, graphs, settings and info
     def setupUi(self, mainWindow):
 
-        stylesheetFile = "Stylesheet.css"
+        stylesheetFile = "Stylesheet.css"       #styling
         fh = open(stylesheetFile)
         qstr = str(fh.read())
-        self.MainWindow = mainWindow
+
+        self.MainWindow = mainWindow            #assign mainwindow
         self.MainWindow.setStyleSheet(qstr)
 
         self.MainWindow.setObjectName("MainWindow")
         self.MainWindow.resize(1000, 650)
 
+        #setup basic variables
         self.devices = []
         self.currentDevice = None
         self.setupLog()
         self.mainQueue = Queue()
+        self.lang = Language(0)
 
+
+        #fill mainwindow
         self.centralwidget = QtWidgets.QWidget(self.MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
@@ -98,7 +104,7 @@ class Ui_MainWindow(object):
 
         self.Logo.setSizePolicy(sizePolicy)
         self.Logo.setMinimumSize(QtCore.QSize(0, 0))
-        self.Logo.setMaximumSize(QtCore.QSize(300, 50))
+        self.Logo.setMaximumSize(QtCore.QSize(250, 50))
 
         font = QtGui.QFont()
         font.setFamily("Calibri")
@@ -160,13 +166,16 @@ class Ui_MainWindow(object):
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.addWidget(self.mainGrid.page0)
 
+        #sets up pages
         self.setupSettingsWindow()
         self.setupEnterDevice()
         self.setupGraphsWindow()
         self.setupManual()
 
+        #sets starting page
         self.stackedWidget.setCurrentIndex(0)
 
+        #binds functions to mainwindow buttons
         self.addADevice.clicked.connect(lambda: self.setIndex(2))
         self.Manual.clicked.connect(lambda: self.setIndex(4))
         self.Graphs.clicked.connect(lambda: self.setIndex(3))
@@ -175,7 +184,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 
         self.MainWindow.setCentralWidget(self.centralwidget)
-        self.retranslateUi(self.MainWindow)
+        self.retranslateUi(0)
 
     def setIndex(self, index):
         try:
@@ -198,27 +207,31 @@ class Ui_MainWindow(object):
                 self.startRoll.setDisabled(False)
                 if self.currentDevice.status == 1:
                     self.startRoll.clicked.connect(lambda: self.rollOut)
-                    self.startRoll.setText("Roll out")
+                    self.startRoll.setText(self.lang.but_StartRollOut)
                 elif self.currentDevice.status == 0:
                     self.startRoll.clicked.connect(lambda: self.rollUp)
-                    self.startRoll.setText("Roll up")
+                    self.startRoll.setText(self.lang.but_startRollUp)
         except Exception as e:
             print(e)
 
+    #set the selected sensortype
     def setSensorType(self, type):
         self.sensorType = type
 
-
+    #change the minimum value of the current device
     def changeMinVal(self, minVal):
-        if self.checkStringForNumber(minVal):
-            self.currentDevice.minVal = int(minVal)
-            self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
-        else:
-            self.showPopup("e", "Not a number", "You have to enter a valid number!")
-        # easter egg
-        if minVal == "aeros development":
-            self.showPopup("e", "Yes thats us!", "But seriously you need to enter a number")
-            self.log.writeInLog("i", "EASTER EGG FOUND!!!")
+        try:
+            if self.checkStringForNumber(minVal):
+                self.currentDevice.minVal = int(minVal)
+                self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
+            else:
+                if minVal == "aeros development":
+                    self.showPopup("e", self.lang.pop_TitleEasterEgg, self.lang.pop_TextEasterEgg)
+                    self.log.writeInLog("i", "EASTER EGG FOUND!!!")
+                self.showPopup("e", self.lang.pop_TitleNotValidNumber, self.lang.pop_TextNotValidNumber)
+        except:
+            self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
+
 
     def checkStringForNumber(self, string):
         numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
@@ -238,33 +251,50 @@ class Ui_MainWindow(object):
             # self.minLight = QtWidgets.QLineEdit(self.settingsWindowWidget)
             # self.minTemp = QtWidgets.QLineEdit(self.settingsWindowWidget)
             self.minVal = QtWidgets.QLineEdit(self.settingsWindowWidget)
+            self.minVal.setText("0")
 
-            chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
-            chgMinVal.setText("Change the minimum value")
-            chgMinVal.clicked.connect(lambda: self.changeMinVal(self.minVal.text()))
+            self.chgMinVal = QtWidgets.QPushButton(self.settingsWindowWidget)
+            self.chgMinVal.setText(self.lang.but_ChgMinVal)
+            self.chgMinVal.clicked.connect(lambda: self.changeMinVal(self.minVal.text()))
 
-            goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
-            goBack.setText("Ok")
-            goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
+            self.goBack.setText(self.lang.but_Ok)
+            self.goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
 
             self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
             for device in self.devices:
                 self.devicesBox.addItem(device.name)
             self.devicesBox.activated[str].connect(self.setCurrentDevice)
 
+            self.languageBox = QtWidgets.QComboBox(self.settingsWindowWidget)
+            self.languageBox.addItem("English")
+            self.languageBox.addItem("Nederlands")
+                #could add more languages
+            self.languageBox.activated[str].connect(self.changeLanguage)
+
             layout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.minVal)
             # layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.minTemp)
-            layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, chgMinVal)
+            layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.chgMinVal)
             # layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.chgMinTemp)
-            layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, goBack)
+            layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.goBack)
             layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.devicesBox)
+            layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.languageBox)
 
             # self.stackedWidget.insertWidget(1,self.page_1)
             self.stackedWidget.addWidget(self.page1)
             self.log.writeInLog("i", "Page 1: settings window created")
-        except:
+        except Exception as e:
+            print(e)
             self.log.writeInLog("w", "Could not create page 1: settings window")
 
+    #change the language,
+    def changeLanguage(self, lang):
+        if lang == "English":
+            self.retranslateUi(0)
+        elif lang == "Nederlands":
+            self.retranslateUi(1)
+
+    #setup page3 containing the graph
     def setupGraphsWindow(self):
         try:
             self.page3 = QtWidgets.QWidget()
@@ -273,15 +303,15 @@ class Ui_MainWindow(object):
             self.graphWidget.setMinimumSize(QtCore.QSize(600, 600))
             self.canvas = PlotCanvas(self.graphWidget)
 
-            goBack = QtWidgets.QPushButton(self.graphWidget)
-            goBack.setText("Ok")
-            goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
-            goBack.move(450, 400)
+            self.goBack2 = QtWidgets.QPushButton(self.graphWidget)
+            self.goBack2.setText(self.lang.but_Ok)
+            self.goBack2.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack2.move(450, 400)
 
-            update = QtWidgets.QPushButton(self.graphWidget)
-            update.setText("update")
-            update.clicked.connect(self.fillGraph)
-            update.move(450, 375)
+            self.update = QtWidgets.QPushButton(self.graphWidget)
+            self.update.setText(self.lang.but_Update)
+            self.update.clicked.connect(self.fillGraph)
+            self.update.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
             for device in self.devices:
@@ -293,44 +323,42 @@ class Ui_MainWindow(object):
             self.log.writeInLog("i", "Page 3: graphs window created")
         except:
             self.log.writeInLog("w", "Could not create page 3: graphs window")
-
+    #fill graph
     def fillGraph(self):
         dataList = []
-        for i in range(10):
-            try:
-                # fill graph
-                #print("test1")
-                #print("test2")
-                #print(self.currentDevice.queue.get())
-                transmis = None
-                q = self.currentDevice.getQueue()
-                try:
-                    #transmis = q.get(True, 2)
-                    pass
-                except Exception as e:
-                    print(e)
+        try:
+            q = self.currentDevice.getQueue()
+        except:# Exception as e:
+            #print(e)
+            self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
+            return
+        # fill graph
+        #print("test1")
+        #print("test2")
+        #print(self.currentDevice.queue.get())
+        transmis = None
+        try:
+            for i in range(10):
+               #transmis = q.get(True, 2)
                 if transmis == None:
-                    print("no data, generating test data")
                     if self.currentDevice.sensorType == "Light":
                         dataList.append(random.uniform(50,100))
                     elif self.currentDevice.sensorType == "Temperature":
                         dataList.append(random.uniform(20,25))
                 else:
-                    #print("test5")
-                    print("real data: " + str(transmis))
                     self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
                     dataList.append(transmis)
-                    #time.sleep(1)
-                try:
-                    #print("test6")
-                    self.canvas.plot(dataList, self.currentDevice.sensorType)
-                    #time.sleep(1)
-                except Exception as e:
-                    print(e)
-                    self.showPopup("e", "Error: No device attached", "There is no device connected, add a device first!")
-            except Exception as e:
-                print(e)
+                #time.sleep(1)
+        except:
+            pass
+        try:
+            #print("test6")
+            self.canvas.plot(dataList, self.currentDevice.sensorType)
+            #time.sleep(1)
+        except Exception as e:
+            print(e)
 
+    #setup page2 containing the settingswindow
     def setupEnterDevice(self):
         try:
             self.page2 = QtWidgets.QWidget()
@@ -341,13 +369,13 @@ class Ui_MainWindow(object):
             self.enterDeviceWidget.setMaximumSize(QtCore.QSize(400, 300))
 
             layout = QtWidgets.QFormLayout(self.enterDeviceWidget)
-            namelabel = QLabel("name")
+            namelabel = QLabel(self.lang.lab_Name)
             # lightlabel = QLabel("Min light")
             # templabel = QLabel("Min temp")
-            valuelabel = QLabel("Minimum value")
-            maxRollLengthLabel = QLabel("Max roll out length in meters")
-            portlabel = QLabel("Port number")
-            sensorlabel = QLabel("Sensor type")
+            valuelabel = QLabel(self.lang.lab_MinVal)
+            maxRollLengthLabel = QLabel(self.lang.lab_MaxRollLength)
+            portlabel = QLabel(self.lang.lab_PortNum)
+            sensorlabel = QLabel(self.lang.lab_SensorType)
 
             self.name = QtWidgets.QLineEdit(self.enterDeviceWidget)  # .setText("")
             # self.light = QtWidgets.QLineEdit(self.enterDeviceWidget)#.setText("0")
@@ -370,21 +398,21 @@ class Ui_MainWindow(object):
             self.maxRollLength.setMaximumSize(QtCore.QSize(100, 200))
             self.port.setMaximumSize(QtCore.QSize(100, 200))
 
-            sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
-            sensor.addItem("Light")
-            sensor.addItem("Temperature")
-            sensor.setMaximumSize(QtCore.QSize(100, 200))
-            sensor.activated[str].connect(self.setSensorType)
+            self.sensor = QtWidgets.QComboBox(self.enterDeviceWidget)
+            self.sensor.addItem(self.lang.selBox_light)
+            self.sensor.addItem(self.lang.selBox_temp)
+            self.sensor.setMaximumSize(QtCore.QSize(100, 200))
+            self.sensor.activated[str].connect(self.setSensorType)
 
-            addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
-            addDevice.setText("Add Device")
-            addDevice.setMaximumSize(QtCore.QSize(100, 300))
-            addDevice.clicked.connect(self.addDeviceNoPar)
+            self.addDevice = QtWidgets.QPushButton(self.enterDeviceWidget)
+            self.addDevice.setText(self.lang.but_AddDevice)
+            self.addDevice.setMaximumSize(QtCore.QSize(120, 300))
+            self.addDevice.clicked.connect(self.addDeviceNoPar)
 
-            goBack = QtWidgets.QPushButton(self.enterDeviceWidget)
-            goBack.setText("Ok")
-            goBack.setMaximumSize(QtCore.QSize(100, 200))
-            goBack.clicked.connect(lambda: self.setIndex(0))
+            self.goBack3 = QtWidgets.QPushButton(self.enterDeviceWidget)
+            self.goBack3.setText(self.lang.but_Ok)
+            self.goBack3.setMaximumSize(QtCore.QSize(100, 200))
+            self.goBack3.clicked.connect(lambda: self.setIndex(0))
 
             layout.addRow(namelabel, self.name)
             # layout.addRow(lightlabel, self.light)
@@ -392,8 +420,8 @@ class Ui_MainWindow(object):
             layout.addRow(valuelabel, self.value)
             layout.addRow(maxRollLengthLabel, self.maxRollLength)
             layout.addRow(portlabel, self.port)
-            layout.addRow(sensorlabel, sensor)
-            layout.addRow(addDevice, goBack)
+            layout.addRow(sensorlabel, self.sensor)
+            layout.addRow(self.addDevice, self.goBack3)
             # self.stackedWidget.insertWidget(2,self.page_2)
 
             self.setSensorType("Light")
@@ -403,7 +431,7 @@ class Ui_MainWindow(object):
             self.log.writeInLog("w", "Could not create Page 2: enter device window")
 
             # makes inputdialog in which you can enter a percentage
-
+    #setup page4 containing the manual mode window
     def setupManual(self):
         try:
             self.page4 = QtWidgets.QWidget()
@@ -411,7 +439,7 @@ class Ui_MainWindow(object):
             layout = QtWidgets.QFormLayout(self.manualWidget)
 
             self.startRoll = QtWidgets.QPushButton(self.manualWidget)
-            self.startRoll.setText("Roll out/in")
+            self.startRoll.setText(self.lang.but_StartRoll)
             self.startRoll.setDisabled(True)
 
 
@@ -420,13 +448,13 @@ class Ui_MainWindow(object):
                 self.devicesBoxManual.addItem(device.name)
             self.devicesBoxManual.activated[str].connect(self.setCurrentDevice)
 
-            ok = QtWidgets.QPushButton(self.manualWidget)
-            ok.setText("Ok")
-            ok.setMaximumSize(QtCore.QSize(100, 200))
-            ok.clicked.connect(lambda: self.setIndex(0))
+            self.ok = QtWidgets.QPushButton(self.manualWidget)
+            self.ok.setText(self.lang.but_Ok)
+            self.ok.setMaximumSize(QtCore.QSize(100, 200))
+            self.ok.clicked.connect(lambda: self.setIndex(0))
 
             layout.addRow(self.devicesBoxManual, self.startRoll)
-            layout.addRow(ok, ok)
+            layout.addRow(self.ok, self.ok)
 
             self.manualWidget.setLayout(layout)
             self.stackedWidget.addWidget(self.page4)
@@ -435,48 +463,50 @@ class Ui_MainWindow(object):
             print(e)
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
+    #roll out the selected device
     def rollOut(self):
-        self.showPopup("i", "Rolling Out!")
+        self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
         self.log.writeInLog("i", self.currentDevice.name + " rolled out")
         self.currentDevice.rollDown()
         self.currentDevice.status = 0
         self.updateMaingrid(self.MainWindow)
 
+    #roll up the selected device
     def rollUp(self):
-        self.showPopup("i", "Rolling up!")
+        self.showPopup("i", self.lang.pop_TitleRollUp, self.currentDevice.name + self.lang.pop_TextRollUp)
         self.log.writeInLog("i", self.currentDevice.name + " rolled up")
         self.currentDevice.rollUp()
         self.currentDevice.status = 1
         self.updateMaingrid(self.MainWindow)
 
-
+    #connect to the device and add it to the dashboard
     def addDeviceNoPar(self):
         if not self.checkStringForNumber(self.name.text()):
             nameRes = self.name.text()
         else:
-            self.showPopup("e", "Not a valid name!", "name has to be text")
+            self.showPopup("e", self.lang.pop_TitleNotValidName, self.lang.pop_TextNotValidName)
             self.name.setText("")
             return
 
         if "COM" in self.port.text():
             portRes = self.port.text()
         else:
-            self.showPopup("e", "Not a valid port!", "Port has to be COM + number")
+            self.showPopup("e", self.lang.pop_TitleNotValidPort, self.lang.pop_TextNotValidPort)
             self.port.setText("COM0")
             return
 
         if self.checkStringForNumber(self.value.text()):
             valRes = int(self.value.text())
         else:
-            self.showPopup("e", "Not a number", "You have to enter a valid number")
+            self.showPopup("e", self.lang.pop_TitleNotValidNumber, self.lang.pop_TextNotValidNumber)
             self.value.setText("0")
             return
 
         try:
             maxRollRes = float(self.maxRollLength.text())
         except:
-            self.showPopup("e", "Not a number", "You have to enter a valid number")
-            self.value.setText("0")
+            self.showPopup("e", self.lang.pop_TitleNotValidNumber, self.lang.pop_TextNotValidNumber)
+            self.maxRollLength.setText("0")
             return
 
         self.name.setText("")
@@ -485,12 +515,12 @@ class Ui_MainWindow(object):
         self.maxRollLength.setText("0")
 
         if nameRes == "":
-            self.showPopup("e", "Error: No name", "New device can not be created without a name.")
+            self.showPopup("e", self.lang.pop_TitleNoName, self.lang.pop_TextNoName)
             return
 
         for device in self.devices:
             if device.name == nameRes:
-                self.showPopup("e", "Error: Duplicate names", "There already is a device with this name.")
+                self.showPopup("e", self.lang.pop_TitleDupNames, self.lang.pop_TextDupNames)
                 self.name.setText("")
                 return
         try:
@@ -506,7 +536,7 @@ class Ui_MainWindow(object):
             self.log.writeInLog("i",
                                 "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
-            self.showPopup("i", "New Device", "Device with name: " + nameRes + " has been added!")
+            self.showPopup("i", self.lang.pop_TitleNewDevice, self.lang.pop_TextNewDevice_1  + nameRes + self.lang.pop_TextNewDevice_2)
             try:
                 self.updateMaingrid(self.MainWindow)
             except Exception as e:
@@ -514,10 +544,10 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(e)
             self.log.writeInLog("w", "Could not add device: " + nameRes)
-            self.showPopup("e", "Could not add device!", "An error has occurred")
+            self.showPopup("e", self.lang.pop_TitleNoNewDevice, self.lang.pop_TextNoNewDevice)
             newDevice = None
 
-
+    #show a popup, can be error or info
     def showPopup(self, type, popupText, popupIText):
         popup = QMessageBox()
         if type == "e":
@@ -534,43 +564,46 @@ class Ui_MainWindow(object):
 
         popup.exec()
 
+    #set the current selected device
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.name == name:
                 self.currentDevice = device
 
-    # sets te text
-    def retranslateUi(self, MainWindow):
+    # sets te text in the given language
+    def retranslateUi(self, type):
+        # choose language
+        self.lang.setLang(type)
         _translate = QtCore.QCoreApplication.translate
         self.MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.addADevice.setText(_translate("MainWindow", "Add a Device"))
-        self.Manual.setText(_translate("MainWindow", "Manual"))
-        self.Graphs.setText(_translate("MainWindow", "Graphs"))
-        self.Settings.setText(_translate("MainWindow", "Settings"))
-        self.Info.setText(_translate("MainWindow", "Info"))
-        self.Sky.setText(_translate("MainWindow", "Sky:  "))
-        self.TempUp.setText(_translate("MainWindow", "Temp: "))
+        self.addADevice.setText(_translate("MainWindow", self.lang.but_AddADevice))
+        self.Manual.setText(_translate("MainWindow", self.lang.but_Manual))
+        self.Graphs.setText(_translate("MainWindow", self.lang.but_Graphs))
+        self.Settings.setText(_translate("MainWindow", self.lang.but_Settings))
+        self.Info.setText(_translate("MainWindow", self.lang.but_Info))
+        self.Sky.setText(_translate("MainWindow", self.lang.lab_Sky))
+        self.TempUp.setText(_translate("MainWindow", self.lang.lab_Temp))
+        self.startRoll.setText("Roll out")
+        self.startRoll.setText("Roll up")
+        self.goBack.setText(self.lang.but_Ok)
+        self.chgMinVal.setText(self.lang.but_ChgMinVal)
+        self.goBack2.setText(self.lang.but_Ok)
+        self.update.setText(self.lang.but_Update)
+        self.addDevice.setText(self.lang.but_AddDevice)
+        self.sensor.clear()
+        self.sensor.addItem(self.lang.selBox_light)
+        self.sensor.addItem(self.lang.selBox_temp)
+        self.goBack3.setText(self.lang.but_Ok)
+        self.startRoll.setText(self.lang.but_StartRoll)
+        self.ok.setText(self.lang.but_Ok)
 
     # Makes popup with info
     def showInfo(self):
-        self.showPopup("i", "Aeros Development", "we made this dashboard")
+        self.showPopup("i", self.lang.pop_TitleInfo, self.lang.pop_TextInfo)
 
-
+    #update the maingrid
     def updateMaingrid(self, MainWindow):
         self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
-
-
-class main():
-    def __init__(self):
-        if __name__ == "__main__":
-            app = QtWidgets.QApplication(sys.argv)
-            self.MainWindow = QtWidgets.QMainWindow()
-            ui = Ui_MainWindow()
-            ui.setupUi(self.MainWindow)
-            self.MainWindow.show()
-            sys.exit(app.exec_())
-
-mainUi = main()

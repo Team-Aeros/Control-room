@@ -3,12 +3,12 @@ QMainWindow {
 }
 
 QWidget#verticalLayoutWidget {
-    background: qlineargradient(x1:0 y1:0, x2:1 y2:0 , stop:0 darkblue, stop:1 black);
+    background-color: #074473;/*#13568B;*/
     border-right-color: black
 }
 
 QWidget #horizontalLayoutWidget {
-    background-color: black;
+    background-color: #074473;
     border-left: none;
 }
 
