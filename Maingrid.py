@@ -33,7 +33,6 @@ class MainGrid():
     def createPage(self):
         for WidgetLong in self.devices:
             WidgetDevice = WidgetLong.name
-        #for WidgetDevice in range(0, 3):   #Debug purposes
             self.dictWidgets[WidgetDevice] = self.rolluikWidget
 
             self.rolluikWidget[WidgetDevice] = QtWidgets.QWidget(self.gridLayoutWidget)
