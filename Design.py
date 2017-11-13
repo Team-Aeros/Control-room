@@ -284,12 +284,14 @@ class Ui_MainWindow(object):
             print(e)
             self.log.writeInLog("w", "Could not create page 1: settings window")
 
+    #change the language,
     def changeLanguage(self, lang):
         if lang == "English":
             self.retranslateUi(0)
         elif lang == "Nederlands":
             self.retranslateUi(1)
 
+    #setup page3 containing the graph
     def setupGraphsWindow(self):
         try:
             self.page3 = QtWidgets.QWidget()
@@ -318,7 +320,7 @@ class Ui_MainWindow(object):
             self.log.writeInLog("i", "Page 3: graphs window created")
         except:
             self.log.writeInLog("w", "Could not create page 3: graphs window")
-
+    #fill graph
     def fillGraph(self):
         dataList = []
         try:
@@ -353,7 +355,7 @@ class Ui_MainWindow(object):
         except Exception as e:
             print(e)
 
-
+    #setup page2 containing the settingswindow
     def setupEnterDevice(self):
         try:
             self.page2 = QtWidgets.QWidget()
@@ -426,7 +428,7 @@ class Ui_MainWindow(object):
             self.log.writeInLog("w", "Could not create Page 2: enter device window")
 
             # makes inputdialog in which you can enter a percentage
-
+    #setup page4 containing the manual mode window
     def setupManual(self):
         try:
             self.page4 = QtWidgets.QWidget()
@@ -458,6 +460,7 @@ class Ui_MainWindow(object):
             print(e)
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
+    #roll out the selected device
     def rollOut(self):
         self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
         self.log.writeInLog("i", self.currentDevice.name + " rolled out")
@@ -465,6 +468,7 @@ class Ui_MainWindow(object):
         self.currentDevice.status = 0
         self.updateMaingrid(self.MainWindow)
 
+    #roll up the selected device
     def rollUp(self):
         self.showPopup("i", self.lang.pop_TitleRollUp, self.currentDevice.name + self.lang.pop_TextRollUp)
         self.log.writeInLog("i", self.currentDevice.name + " rolled up")
@@ -472,7 +476,7 @@ class Ui_MainWindow(object):
         self.currentDevice.status = 1
         self.updateMaingrid(self.MainWindow)
 
-
+    #connect to the device and add it to the dashboard
     def addDeviceNoPar(self):
         if not self.checkStringForNumber(self.name.text()):
             nameRes = self.name.text()
@@ -540,7 +544,7 @@ class Ui_MainWindow(object):
             self.showPopup("e", self.lang.pop_TitleNoNewDevice, self.lang.pop_TextNoNewDevice)
             newDevice = None
 
-
+    #show a popup, can be error or info
     def showPopup(self, type, popupText, popupIText):
         popup = QMessageBox()
         if type == "e":
@@ -557,12 +561,13 @@ class Ui_MainWindow(object):
 
         popup.exec()
 
+    #set the current selected device
     def setCurrentDevice(self, name):
         for device in self.devices:
             if device.name == name:
                 self.currentDevice = device
 
-    # sets te text
+    # sets te text in the given language
     def retranslateUi(self, type):
         # choose language
         self.lang.setLang(type)
@@ -593,7 +598,7 @@ class Ui_MainWindow(object):
     def showInfo(self):
         self.showPopup("i", self.lang.pop_TitleInfo, self.lang.pop_TextInfo)
 
-
+    #update the maingrid
     def updateMaingrid(self, MainWindow):
         self.page0.setParent(None)
         self.page0 = QtWidgets.QWidget(MainWindow)
