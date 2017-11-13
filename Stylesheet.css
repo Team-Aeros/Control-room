@@ -3,7 +3,8 @@ QMainWindow {
 }
 
 QWidget#verticalLayoutWidget {
-    background-color: #074473;/*#13568B;*/
+    background-color: #707f7c;
+
     border-right-color: black
 }
 
@@ -13,7 +14,7 @@ QWidget #horizontalLayoutWidget {
 }
 
 QStackedWidget {
-    background-image: url("triangular.png");
+    background-image: url("background MainGrid.jpg");
 }
 
 QPushButton{
