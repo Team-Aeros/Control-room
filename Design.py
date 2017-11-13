@@ -40,6 +40,7 @@ class Ui_MainWindow(object):
         self.currentDevice = None
         self.setupLog()
         self.mainQueue = Queue()
+        #print(self.mainQueue)
         self.lang = Language(0)
 
 
@@ -211,6 +212,8 @@ class Ui_MainWindow(object):
                 elif self.currentDevice.status == 0:
                     self.startRoll.clicked.connect(lambda: self.rollUp)
                     self.startRoll.setText(self.lang.but_startRollUp)
+            self.updatelabels(self.mainQueue)
+            self.updateMaingrid(self.MainWindow)
         except Exception as e:
             print(e)
 
@@ -259,7 +262,7 @@ class Ui_MainWindow(object):
 
             self.goBack = QtWidgets.QPushButton(self.settingsWindowWidget)
             self.goBack.setText(self.lang.but_Ok)
-            self.goBack.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack.clicked.connect(lambda: self.setIndex(0))
 
             self.devicesBox = QtWidgets.QComboBox(self.settingsWindowWidget)
             for device in self.devices:
@@ -305,12 +308,12 @@ class Ui_MainWindow(object):
 
             self.goBack2 = QtWidgets.QPushButton(self.graphWidget)
             self.goBack2.setText(self.lang.but_Ok)
-            self.goBack2.clicked.connect(lambda: self.stackedWidget.setCurrentIndex(0))
+            self.goBack2.clicked.connect(lambda: self.setIndex(0))
             self.goBack2.move(450, 400)
 
             self.update = QtWidgets.QPushButton(self.graphWidget)
             self.update.setText(self.lang.but_Update)
-            self.update.clicked.connect(self.fillGraph)
+            self.update.clicked.connect(lambda: self.fillGraph(self.mainQueue))
             self.update.move(450, 375)
 
             self.devicesBoxGraphs = QtWidgets.QComboBox(self.graphWidget)
@@ -324,22 +327,36 @@ class Ui_MainWindow(object):
         except:
             self.log.writeInLog("w", "Could not create page 3: graphs window")
     #fill graph
-    def fillGraph(self):
+    def fillGraph(self, queue):
         dataList = []
         try:
-            q = self.currentDevice.getQueue()
-        except:# Exception as e:
-            #print(e)
+            q = queue
+            #print(q)
+        except Exception as e:
+            print(e)
             self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
             return
         # fill graph
-        #print("test1")
-        #print("test2")
-        #print(self.currentDevice.queue.get())
-        transmis = None
         try:
-            for i in range(10):
-               #transmis = q.get(True, 2)
+            for elem in list(q.queue):
+                dataList.append(elem)
+            self.update.setDisabled(True)
+            self.updatelabels(self.mainQueue)
+            time.sleep(3)
+            self.update.setDisabled(False)
+
+            #print("test2")
+            """for i in range(11):
+                transmis = None
+                #print("\ngetting data\n")
+                self.log.writeInLog("i", "Getting data for graph")
+                try:
+                    transmis = q.get_nowait()
+                    self.log.writeInLog("i", "Got data: " + str(transmis))
+                except Exception as e:
+                    self.log.writeInLog("e", "Could not get data for graph")
+                    print(e)
+                print("transmis: " + str(transmis))
                 if transmis == None:
                     if self.currentDevice.sensorType == "Light":
                         dataList.append(random.uniform(50,100))
@@ -348,9 +365,11 @@ class Ui_MainWindow(object):
                 else:
                     self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
                     dataList.append(transmis)
+                    q.put(transmis)"""
                 #time.sleep(1)
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            #pass
         try:
             #print("test6")
             self.canvas.plot(dataList, self.currentDevice.sensorType)
@@ -524,11 +543,11 @@ class Ui_MainWindow(object):
                 self.name.setText("")
                 return
         try:
-            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes, self.mainQueue)  # lightRes, tempRes)
+            newDevice = Device(nameRes, portRes, self.sensorType, valRes, maxRollRes)#, self.mainQueue)  # lightRes, tempRes)
             self.devices.append(newDevice)
             self.setCurrentDevice(self.devices[0].name)
             try:
-                receiving = Thread(target=self.currentDevice.receive)
+                receiving = Thread(target=newDevice.doReceive, args=(self.mainQueue,))
                 receiving.daemon = True
                 receiving.start()
             except Exception as e:
@@ -607,3 +626,27 @@ class Ui_MainWindow(object):
         self.page0 = QtWidgets.QWidget(MainWindow)
         self.mainGrid = MainGrid(self.page0, self.devices)
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
+
+    def updatelabels(self, queue):
+        dataList = []
+        q = queue
+        for elem in list(q.queue):
+            dataList.append(elem)
+        if len(dataList) > 3:
+            useDatalist = dataList[-3:]
+        else:
+            return
+        sum = 0.0
+        for data in useDatalist:
+            #print("data: " + str(data))
+            sum += data
+        avg = int(sum / 3)
+        #print("avg: " + str(avg))
+        if avg >= 80:
+            self.Sky.setText(self.lang.lab_Sky + "Sunny")
+        elif avg >= 50 and avg < 80:
+            self.Sky.setText(self.lang.lab_Sky + "Clear")
+        elif avg >= 30 and avg < 50:
+            self.Sky.setText(self.lang.lab_Sky + "Cloudy")
+        elif avg < 30:
+            self.Sky.setText(self.lang.lab_Sky + "Dark")
