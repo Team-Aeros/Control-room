@@ -174,6 +174,7 @@ class Ui_MainWindow(object):
         self.setupManual()
 
         #sets starting page
+        #self.updateMaingrid(self.MainWindow)
         self.stackedWidget.setCurrentIndex(0)
 
         #binds functions to mainwindow buttons
@@ -213,7 +214,7 @@ class Ui_MainWindow(object):
                     self.startRoll.clicked.connect(lambda: self.rollUp)
                     self.startRoll.setText(self.lang.but_startRollUp)
             self.updatelabels(self.mainQueue)
-            self.updateMaingrid(self.MainWindow)
+
         except Exception as e:
             print(e)
 
@@ -372,7 +373,8 @@ class Ui_MainWindow(object):
             #pass
         try:
             #print("test6")
-            self.canvas.plot(dataList, self.currentDevice.sensorType)
+            useDataList = dataList[-30:]
+            self.canvas.plot(useDataList, self.currentDevice.sensorType)
             #time.sleep(1)
         except Exception as e:
             print(e)
