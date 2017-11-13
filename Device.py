@@ -1,6 +1,5 @@
 import serial
 import time
-from queue import Queue
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
 
@@ -21,7 +20,7 @@ class Device():
             self.minVal = minVal
         elif self.sensorType == "Light":  # If no custom value is given and sensor type = "Light" use default light value
             self.minVal = 50
-        elif self.sensorType == "Temp":  # If no custom value is given and sensor type = "Temp" use default light value
+        elif self.sensorType == "Temperature":  # If no custom value is given and sensor type = "Temp" use default light value
             self.minVal = 22
 
         self.establishConnection()  # Establish connection using given port
@@ -87,8 +86,11 @@ class Device():
                 #print(transmission)
                 #print(value)
                 #print("val: " + str(self.value))
-                queue.put(self.value)
-                #print("data count: " + str(self.count) + " " + str(round(queue.get(),2)))
+                queue.put(self.name + "-" + str(self.value))
+                #a = queue.get()
+                #b = a.split("-")
+                #c = b[1]
+                #print("data count: " + str(self.count) + " " + str(c))
                 #self.count += 1
                 #queue.put(self.value)
 

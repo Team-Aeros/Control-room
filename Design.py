@@ -174,6 +174,7 @@ class Ui_MainWindow(object):
         self.setupManual()
 
         #sets starting page
+        #self.updateMaingrid(self.MainWindow)
         self.stackedWidget.setCurrentIndex(0)
 
         #binds functions to mainwindow buttons
@@ -213,7 +214,7 @@ class Ui_MainWindow(object):
                     self.startRoll.clicked.connect(lambda: self.rollUp)
                     self.startRoll.setText(self.lang.but_startRollUp)
             self.updatelabels(self.mainQueue)
-            self.updateMaingrid(self.MainWindow)
+
         except Exception as e:
             print(e)
 
@@ -342,38 +343,32 @@ class Ui_MainWindow(object):
                 dataList.append(elem)
             self.update.setDisabled(True)
             self.updatelabels(self.mainQueue)
-            time.sleep(3)
-            self.update.setDisabled(False)
 
-            #print("test2")
-            """for i in range(11):
-                transmis = None
-                #print("\ngetting data\n")
-                self.log.writeInLog("i", "Getting data for graph")
-                try:
-                    transmis = q.get_nowait()
-                    self.log.writeInLog("i", "Got data: " + str(transmis))
-                except Exception as e:
-                    self.log.writeInLog("e", "Could not get data for graph")
-                    print(e)
-                print("transmis: " + str(transmis))
-                if transmis == None:
-                    if self.currentDevice.sensorType == "Light":
-                        dataList.append(random.uniform(50,100))
-                    elif self.currentDevice.sensorType == "Temperature":
-                        dataList.append(random.uniform(20,25))
-                else:
-                    self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
-                    dataList.append(transmis)
-                    q.put(transmis)"""
-                #time.sleep(1)
         except Exception as e:
             print(e)
             #pass
         try:
-            #print("test6")
-            self.canvas.plot(dataList, self.currentDevice.sensorType)
-            #time.sleep(1)
+            listdata = []
+            for item in dataList:
+                items = item.split("-")
+                name = items[0]
+                data = round(float(items[1]),2)
+                self.log.writeInLog("i", "Data from " + name + " ready for graph | " + str(data))
+                if name == self.currentDevice.name:
+                    if self.currentDevice.sensorType == "Temperature":
+                        voltage = data * 5.0
+                        voltage /= 1024.0
+                        tempData = (voltage - 0.5) * 100
+                        tempData += 10
+                        print(tempData)
+                        listdata.append(tempData)
+                    else:
+                        listdata.append(data)
+
+            useDataList = listdata[-30:]
+            self.canvas.plot(useDataList, self.currentDevice.sensorType)
+            time.sleep(2)
+            self.update.setDisabled(False)
         except Exception as e:
             print(e)
 
@@ -631,11 +626,13 @@ class Ui_MainWindow(object):
         dataList = []
         q = queue
         for elem in list(q.queue):
-            dataList.append(elem)
+            items = elem.split("-")
+            dataList.append(round(float(items[1]),2))
         if len(dataList) > 3:
             useDatalist = dataList[-3:]
         else:
             return
+
         sum = 0.0
         for data in useDatalist:
             #print("data: " + str(data))
