@@ -224,7 +224,7 @@ class Ui_MainWindow(object):
     def changeMinVal(self, minVal):
         try:
             if self.checkStringForNumber(minVal):
-                self.currentDevice.minVal = int(minVal)
+                self.currentDevice.setMinVal(int(minVal))
                 self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
             else:
                 if minVal == "aeros development":

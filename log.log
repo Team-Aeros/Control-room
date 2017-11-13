@@ -1,0 +1,12 @@
+INFO:root:[2017-11-07 14:40:26] Page 1: settings window created
+INFO:root:[2017-11-07 14:40:26] Page 2: enter device window created
+INFO:root:[2017-11-07 14:40:26] Page 3: graphs window created
+INFO:root:[2017-11-07 14:40:26] Page 4: manual window created
+INFO:root:[2017-11-07 14:40:26] New device added: name: Attic | Port: COM5 | Sensor type: Light | Minimum value: 0 | Max roll length: 1.5
+INFO:root:[2017-11-07 14:40:26] Information popup shown: New Device | Device with name: Attic has been added!
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
+INFO:root:[2017-11-07 14:40:26] Minimum value from Attic changed to 20
