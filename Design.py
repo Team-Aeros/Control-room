@@ -343,39 +343,24 @@ class Ui_MainWindow(object):
                 dataList.append(elem)
             self.update.setDisabled(True)
             self.updatelabels(self.mainQueue)
-            time.sleep(3)
-            self.update.setDisabled(False)
 
-            #print("test2")
-            """for i in range(11):
-                transmis = None
-                #print("\ngetting data\n")
-                self.log.writeInLog("i", "Getting data for graph")
-                try:
-                    transmis = q.get_nowait()
-                    self.log.writeInLog("i", "Got data: " + str(transmis))
-                except Exception as e:
-                    self.log.writeInLog("e", "Could not get data for graph")
-                    print(e)
-                print("transmis: " + str(transmis))
-                if transmis == None:
-                    if self.currentDevice.sensorType == "Light":
-                        dataList.append(random.uniform(50,100))
-                    elif self.currentDevice.sensorType == "Temperature":
-                        dataList.append(random.uniform(20,25))
-                else:
-                    self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
-                    dataList.append(transmis)
-                    q.put(transmis)"""
-                #time.sleep(1)
         except Exception as e:
             print(e)
             #pass
         try:
-            #print("test6")
-            useDataList = dataList[-30:]
+            listdata = []
+            for item in dataList:
+                items = item.split("-")
+                name = items[0]
+                data = round(float(items[1]),2)
+
+                if name == self.currentDevice.name:
+                    listdata.append(data)
+
+            useDataList = listdata[-30:]
             self.canvas.plot(useDataList, self.currentDevice.sensorType)
-            #time.sleep(1)
+            time.sleep(2)
+            self.update.setDisabled(False)
         except Exception as e:
             print(e)
 
@@ -633,11 +618,13 @@ class Ui_MainWindow(object):
         dataList = []
         q = queue
         for elem in list(q.queue):
-            dataList.append(elem)
+            items = elem.split("-")
+            dataList.append(round(float(items[1]),2))
         if len(dataList) > 3:
             useDatalist = dataList[-3:]
         else:
             return
+
         sum = 0.0
         for data in useDatalist:
             #print("data: " + str(data))

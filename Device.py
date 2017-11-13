@@ -87,8 +87,11 @@ class Device():
                 #print(transmission)
                 #print(value)
                 #print("val: " + str(self.value))
-                queue.put(self.value)
-                #print("data count: " + str(self.count) + " " + str(round(queue.get(),2)))
+                queue.put(self.name + "-" + str(self.value))
+                #a = queue.get()
+                #b = a.split("-")
+                #c = b[1]
+                #print("data count: " + str(self.count) + " " + str(c))
                 #self.count += 1
                 #queue.put(self.value)
 
