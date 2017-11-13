@@ -220,14 +220,17 @@ class Ui_MainWindow(object):
 
     #change the minimum value of the current device
     def changeMinVal(self, minVal):
-        if self.checkStringForNumber(minVal):
-            self.currentDevice.minVal = int(minVal)
-            self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
-        else:
-            if minVal == "aeros development":
-                self.showPopup("e", self.lang.pop_TitleEasterEgg, self.lang.pop_TextEasterEgg)
-                self.log.writeInLog("i", "EASTER EGG FOUND!!!")
-            self.showPopup("e", self.lang.pop_TitleNotValidNumber, self.lang.pop_TextNotValidNumber)
+        try:
+            if self.checkStringForNumber(minVal):
+                self.currentDevice.minVal = int(minVal)
+                self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
+            else:
+                if minVal == "aeros development":
+                    self.showPopup("e", self.lang.pop_TitleEasterEgg, self.lang.pop_TextEasterEgg)
+                    self.log.writeInLog("i", "EASTER EGG FOUND!!!")
+                self.showPopup("e", self.lang.pop_TitleNotValidNumber, self.lang.pop_TextNotValidNumber)
+        except:
+            self.showPopup("e", self.lang.pop_TitleDevNotAttached, self.lang.pop_TextDevNotAttached)
 
 
     def checkStringForNumber(self, string):

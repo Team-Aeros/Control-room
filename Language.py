@@ -77,6 +77,7 @@ class Language():
         self.pop_TitleInfo = "Aeros Development"
         self.pop_TextInfo = "Members: Robert Monden, Michel Glazenborg, Willem Slager and Jelmer Haarman"
 
+
     def load_dutch(self):
         self.but_AddADevice = "Voeg apparaat\ntoe"
         self.lab_Name = "Naam"
