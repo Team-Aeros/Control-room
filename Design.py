@@ -136,11 +136,11 @@ class Ui_MainWindow(object):
         self.fSkyTemp.setObjectName("fSkyTemp")
 
         self.Sky = QtWidgets.QLabel(self.fSkyTemp)
-        self.Sky.setGeometry(QtCore.QRect(10, 20, 75, 13))
+        self.Sky.setGeometry(QtCore.QRect(10, 20, 75, 20))
         self.Sky.setObjectName("Sky")
 
         self.TempUp = QtWidgets.QLabel(self.fSkyTemp)
-        self.TempUp.setGeometry(QtCore.QRect(100, 20, 75, 13))
+        self.TempUp.setGeometry(QtCore.QRect(100, 20, 75, 20))
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -212,7 +212,6 @@ class Ui_MainWindow(object):
                 elif self.currentDevice.status == 0:
                     self.startRoll.setText(self.lang.but_startRollUp)
             self.updatelabels(self.mainQueue)
-
         except Exception as e:
             print(e)
 
@@ -344,7 +343,7 @@ class Ui_MainWindow(object):
             for elem in list(q.queue):
                 dataList.append(elem)
             self.update.setDisabled(True)
-            self.updatelabels(self.mainQueue)
+
 
         except Exception as e:
             print(e)
@@ -362,13 +361,14 @@ class Ui_MainWindow(object):
                         voltage /= 1024.0
                         tempData = (voltage - 0.5) * 100
                         tempData += 10
-                        print(tempData)
+                        #print(tempData)
                         listdata.append(tempData)
                     elif self.currentDevice.sensorType == "Light":
                         listdata.append(data)
 
             useDataList = listdata[-30:]
             self.canvas.plot(useDataList, self.currentDevice.sensorType)
+            self.updatelabels(self.mainQueue)
             time.sleep(2)
             self.update.setDisabled(False)
         except Exception as e:
@@ -627,27 +627,44 @@ class Ui_MainWindow(object):
         self.stackedWidget.insertWidget(0, self.mainGrid.page0)  # this changed right
 
     def updatelabels(self, queue):
-        dataList = []
+        print("test")
+        dataListLight = []
+        dataListTemp = []
         q = queue
         for elem in list(q.queue):
             items = elem.split("-")
-            dataList.append(round(float(items[1]),2))
-        if len(dataList) > 3:
-            useDatalist = dataList[-3:]
-        else:
-            return
-
-        sum = 0.0
-        for data in useDatalist:
-            #print("data: " + str(data))
-            sum += data
-        avg = int(sum / 3)
-        #print("avg: " + str(avg))
-        if avg >= 80:
-            self.Sky.setText(self.lang.lab_Sky + "Sunny")
-        elif avg >= 50 and avg < 80:
-            self.Sky.setText(self.lang.lab_Sky + "Clear")
-        elif avg >= 30 and avg < 50:
-            self.Sky.setText(self.lang.lab_Sky + "Cloudy")
-        elif avg < 30:
-            self.Sky.setText(self.lang.lab_Sky + "Dark")
+            name = items[0]
+            if name == self.currentDevice.name:
+                if self.currentDevice.sensorType == "Light":
+                    #print(items[1])
+                    dataListLight.append(round(float(items[1]),2))
+                elif self.currentDevice.sensorType == "Temperature":
+                    #print(items[1])
+                    dataListTemp.append(round(float(items[1]), 2))
+        if len(dataListLight) > 3:
+            useDatalistLight = dataListLight[-3:]
+            sum = 0.0
+            for data in useDatalistLight:
+                # print("data: " + str(data))
+                sum += data
+            avg = int(sum / 3)
+            # print("avg: " + str(avg))
+            if avg >= 80:
+                self.Sky.setText(self.lang.lab_Sky + "Sunny")
+            elif avg >= 50 and avg < 80:
+                self.Sky.setText(self.lang.lab_Sky + "Clear")
+            elif avg >= 30 and avg < 50:
+                self.Sky.setText(self.lang.lab_Sky + "Cloudy")
+            elif avg < 30:
+                self.Sky.setText(self.lang.lab_Sky + "Dark")
+        if len(dataListTemp) > 0:
+            useDatalistTemp = dataListTemp[-1:]
+            #print(useDatalistTemp)
+            temp = useDatalistTemp[0]
+            #print(temp)
+            voltage = temp * 5.0
+            voltage /= 1024.0
+            tempData = (voltage - 0.5) * 100
+            tempData += 10
+            #print(tempData)
+            self.TempUp.setText(self.lang.lab_Temp + str(tempData))
