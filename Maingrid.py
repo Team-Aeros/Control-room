@@ -50,7 +50,7 @@ class MainGrid():
             self.rolluik[WidgetDevice] = QtWidgets.QLabel(self.rolluikWidget[WidgetDevice])
             self.rolluik[WidgetDevice].setStyleSheet("font-size: 24px;"
                                                      "color: black;")
-            self.rolluik[WidgetDevice].setGeometry(QtCore.QRect(10, 10, 150, 20))
+            self.rolluik[WidgetDevice].setGeometry(QtCore.QRect(10, 10, 150, 40))
             self.rolluik[WidgetDevice].setObjectName("Rolluik" + str(WidgetDevice))
 
 
