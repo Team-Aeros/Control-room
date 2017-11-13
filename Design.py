@@ -174,6 +174,7 @@ class Ui_MainWindow(object):
         self.setupManual()
 
         #sets starting page
+        #self.updateMaingrid(self.MainWindow)
         self.stackedWidget.setCurrentIndex(0)
 
         #binds functions to mainwindow buttons
@@ -207,13 +208,11 @@ class Ui_MainWindow(object):
             if len(self.devices) > 0:
                 self.startRoll.setDisabled(False)
                 if self.currentDevice.status == 1:
-                    self.startRoll.clicked.connect(lambda: self.rollOut)
                     self.startRoll.setText(self.lang.but_StartRollOut)
                 elif self.currentDevice.status == 0:
-                    self.startRoll.clicked.connect(lambda: self.rollUp)
                     self.startRoll.setText(self.lang.but_startRollUp)
             self.updatelabels(self.mainQueue)
-            self.updateMaingrid(self.MainWindow)
+
         except Exception as e:
             print(e)
 
@@ -225,7 +224,7 @@ class Ui_MainWindow(object):
     def changeMinVal(self, minVal):
         try:
             if self.checkStringForNumber(minVal):
-                self.currentDevice.minVal = int(minVal)
+                self.currentDevice.setMinVal(int(minVal))
                 self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
             else:
                 if minVal == "aeros development":
@@ -342,38 +341,32 @@ class Ui_MainWindow(object):
                 dataList.append(elem)
             self.update.setDisabled(True)
             self.updatelabels(self.mainQueue)
-            time.sleep(3)
-            self.update.setDisabled(False)
 
-            #print("test2")
-            """for i in range(11):
-                transmis = None
-                #print("\ngetting data\n")
-                self.log.writeInLog("i", "Getting data for graph")
-                try:
-                    transmis = q.get_nowait()
-                    self.log.writeInLog("i", "Got data: " + str(transmis))
-                except Exception as e:
-                    self.log.writeInLog("e", "Could not get data for graph")
-                    print(e)
-                print("transmis: " + str(transmis))
-                if transmis == None:
-                    if self.currentDevice.sensorType == "Light":
-                        dataList.append(random.uniform(50,100))
-                    elif self.currentDevice.sensorType == "Temperature":
-                        dataList.append(random.uniform(20,25))
-                else:
-                    self.log.writeInLog("i", "Data from " + self.currentDevice.name + " received: " + str(transmis))
-                    dataList.append(transmis)
-                    q.put(transmis)"""
-                #time.sleep(1)
         except Exception as e:
             print(e)
             #pass
         try:
-            #print("test6")
-            self.canvas.plot(dataList, self.currentDevice.sensorType)
-            #time.sleep(1)
+            listdata = []
+            for item in dataList:
+                items = item.split("-")
+                name = items[0]
+                data = round(float(items[1]),2)
+                self.log.writeInLog("i", "Data from " + name + " ready for graph | " + str(data))
+                if name == self.currentDevice.name:
+                    if self.currentDevice.sensorType == "Temperature":
+                        voltage = data * 5.0
+                        voltage /= 1024.0
+                        tempData = (voltage - 0.5) * 100
+                        tempData += 10
+                        print(tempData)
+                        listdata.append(tempData)
+                    elif self.currentDevice.sensorType == "Light":
+                        listdata.append(data)
+
+            useDataList = listdata[-30:]
+            self.canvas.plot(useDataList, self.currentDevice.sensorType)
+            time.sleep(2)
+            self.update.setDisabled(False)
         except Exception as e:
             print(e)
 
@@ -459,6 +452,7 @@ class Ui_MainWindow(object):
 
             self.startRoll = QtWidgets.QPushButton(self.manualWidget)
             self.startRoll.setText(self.lang.but_StartRoll)
+            self.startRoll.clicked.connect(self.rollUpOut)
             self.startRoll.setDisabled(True)
 
 
@@ -482,21 +476,18 @@ class Ui_MainWindow(object):
             print(e)
             self.log.writeInLog("w", "Could not create Page 4: manual window")
 
-    #roll out the selected device
-    def rollOut(self):
+    #roll out or up the selected device
+    def rollUpOut(self):
         self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
         self.log.writeInLog("i", self.currentDevice.name + " rolled out")
-        self.currentDevice.rollDown()
-        self.currentDevice.status = 0
+        if self.currentDevice.status == 1:
+            self.currentDevice.rollDown()
+            self.currentDevice.status = 0
+        elif self.currentDevice.status == 0:
+            self.currentDevice.rollUp()
         self.updateMaingrid(self.MainWindow)
 
-    #roll up the selected device
-    def rollUp(self):
-        self.showPopup("i", self.lang.pop_TitleRollUp, self.currentDevice.name + self.lang.pop_TextRollUp)
-        self.log.writeInLog("i", self.currentDevice.name + " rolled up")
-        self.currentDevice.rollUp()
-        self.currentDevice.status = 1
-        self.updateMaingrid(self.MainWindow)
+
 
     #connect to the device and add it to the dashboard
     def addDeviceNoPar(self):
@@ -553,7 +544,7 @@ class Ui_MainWindow(object):
             except Exception as e:
                 print(e)
             self.log.writeInLog("i",
-                                "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.sensorType + " | Minimum value: " + str(
+                                "New device added: name: " + nameRes + " | Port: " + portRes + " | Sensor type: " + self.currentDevice.sensorType + " | Minimum value: " + str(
                                     valRes) + " | Max roll length: " + str(maxRollRes))
             self.showPopup("i", self.lang.pop_TitleNewDevice, self.lang.pop_TextNewDevice_1  + nameRes + self.lang.pop_TextNewDevice_2)
             try:
@@ -631,11 +622,13 @@ class Ui_MainWindow(object):
         dataList = []
         q = queue
         for elem in list(q.queue):
-            dataList.append(elem)
+            items = elem.split("-")
+            dataList.append(round(float(items[1]),2))
         if len(dataList) > 3:
             useDatalist = dataList[-3:]
         else:
             return
+
         sum = 0.0
         for data in useDatalist:
             #print("data: " + str(data))

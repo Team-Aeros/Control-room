@@ -29,7 +29,7 @@ class PlotCanvas(FigureCanvas):
             self.ax.set_ylim([0, 100])
         else:
             self.ax.set_ylabel("Temperature")
-            self.ax.set_ylim([0, 30])
+            self.ax.set_ylim([0, 40])
 
 
 
