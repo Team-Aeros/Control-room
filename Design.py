@@ -353,9 +353,17 @@ class Ui_MainWindow(object):
                 items = item.split("-")
                 name = items[0]
                 data = round(float(items[1]),2)
-
+                self.log.writeInLog("i", "Data from " + name + " ready for graph | " + str(data))
                 if name == self.currentDevice.name:
-                    listdata.append(data)
+                    if self.currentDevice.sensorType == "Temperature":
+                        voltage = data * 5.0
+                        voltage /= 1024.0
+                        tempData = (voltage - 0.5) * 100
+                        tempData += 10
+                        print(tempData)
+                        listdata.append(tempData)
+                    else:
+                        listdata.append(data)
 
             useDataList = listdata[-30:]
             self.canvas.plot(useDataList, self.currentDevice.sensorType)
