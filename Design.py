@@ -219,12 +219,16 @@ class Ui_MainWindow(object):
     #set the selected sensortype
     def setSensorType(self, type):
         self.sensorType = type
+        if self.sensorType == "Temperature":
+            self.value.setText("22")
+        elif self.sensorType == "Light":
+            self.value.setText("50")
 
     #change the minimum value of the current device
     def changeMinVal(self, minVal):
         try:
             if self.checkStringForNumber(minVal):
-                self.currentDevice.minVal = int(minVal)
+                self.currentDevice.setMinval(int(minVal))
                 self.log.writeInLog("i", "Minimum value from " + self.currentDevice.name + " changed to " + minVal)
             else:
                 if minVal == "aeros development":
@@ -400,7 +404,7 @@ class Ui_MainWindow(object):
             # self.light.setText("0")
             # self.temp.setText("0")
             self.maxRollLength.setText("0")
-            self.value.setText("0")
+            self.value.setText("50")
             self.port.setText("COM0")
 
             self.name.setMaximumSize(QtCore.QSize(100, 200))
@@ -478,13 +482,17 @@ class Ui_MainWindow(object):
 
     #roll out or up the selected device
     def rollUpOut(self):
-        self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
-        self.log.writeInLog("i", self.currentDevice.name + " rolled out")
+
         if self.currentDevice.status == 1:
             self.currentDevice.rollDown()
             self.currentDevice.status = 0
+            self.showPopup("i", self.lang.pop_TitleRollOut, self.currentDevice.name + self.lang.pop_TextRollOut)
+            self.log.writeInLog("i", self.currentDevice.name + " rolled out")
         elif self.currentDevice.status == 0:
             self.currentDevice.rollUp()
+            self.currentDevice.status = 1
+            self.showPopup("i", self.lang.pop_TitleRollUp, self.currentDevice.name + self.lang.pop_TextRollUp)
+            self.log.writeInLog("i", self.currentDevice.name + " rolled up")
         self.updateMaingrid(self.MainWindow)
 
 
