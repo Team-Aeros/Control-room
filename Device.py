@@ -1,20 +1,21 @@
 import serial
 import time
-
+from queue import Queue
 def print_status(msg):
     print('=> Debug: {0}'.format(msg))
 
 
 class Device():
-    def __init__(self, name, portNumber, sensorType, minVal, maxLength, queuePar):
+    def __init__(self, name, portNumber, sensorType, minVal, maxLength):#, queuePar):
         self.name = name  # Custom name of device. For example: Living room
         self.status = 1  # 1 = rolled up, 0 = rolled down
         self.portNumber = portNumber  # Port used to connect to device
         self.sensorType = sensorType  # Type of sensor used in device
         self.maxLength = maxLength  # Maximun roll distance of the shutter
         self.rollPercentage = 0  # Percentage shutter has rolled out. Between 0 and 100
-        self.queue = queuePar
+        #self.queue = queuePar
         self.value = 0
+        self.count = 0
 
         if minVal != 0:  # If custom value is given use that value
             self.minVal = minVal
@@ -55,13 +56,16 @@ class Device():
     def transmit(self, message):
         self.connection.write(bytes([message]))  # Send message to device, Can use decimal, binary
 
-    def receive(self):
+    def receive(self, queue):
+        #print("receive: " + str(queue))
         data = self.connection.read()
+        #print("data test")
         if not data:
+            #print("data test 2")
             return
 
         transmission = int(ord(data))
-
+        #transmission = 0b01000000
         if transmission != 0xff:
             return
 
@@ -70,6 +74,7 @@ class Device():
             transmission = int(ord(data))
             if transmission == 0b01000000:
                 while True:
+                    #print("loop")
                     data = self.connection.read()
                     transmission = int(ord(data))
                     if transmission == 0b01110000:
@@ -77,11 +82,15 @@ class Device():
                     else:
                         self.value += transmission
                 self.value /= 10
+                #self.value = 50
                 #print(data)
                 #print(transmission)
                 #print(value)
-                self.queue.put(self.value)
-                print(round(self.queue.get(),2))
+                #print("val: " + str(self.value))
+                queue.put(self.value)
+                #print("data count: " + str(self.count) + " " + str(round(queue.get(),2)))
+                #self.count += 1
+                #queue.put(self.value)
 
             elif transmission == 0b01010001:
                 print("Shutter rolled up")
@@ -127,20 +136,22 @@ class Device():
         self.transmit(percentage)
         self.rollPercentage = percentage
 
-    def getQueue(self):
-        return self.queue
+    def doReceive(self, queue):
+        while True:
+            self.transmit(1)
+            self.receive(queue)
 
 
 # Test code
 """port = 'COM5'
 try:
     q = Queue()
-    shutter = Device("Attic", port, "Light", 70, 0.10, q)
+    shutter = Device("Attic", port, "Light", 70, 0.10)#, q)
     print("Connection established on {0}".format(port))
 
     while True:
         shutter.transmit(1)
-        shutter.receive()
+        shutter.receive(q)
 
 except Exception as e:
     print(e)"""

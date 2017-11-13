@@ -14,15 +14,16 @@ class PlotCanvas(FigureCanvas):
 
         self.ax.set_title('data')
         self.ax.set_xlabel("Seconds")
-        self.ax.set_xlim([0, 10])
+        self.ax.set_xlim([0, 30])
         self.ax.set_ylabel("Light")
         self.ax.set_ylim([0, 100])
         self.draw()
 
     def plot(self, data, sensorType):
         self.ax.clear()
+        self.ax.set_title('data')
         self.ax.set_xlabel("Seconds")
-        self.ax.set_xlim([0, 10])
+        self.ax.set_xlim([0, 30])
         if sensorType == "Light":
             self.ax.set_ylabel("Light")
             self.ax.set_ylim([0, 100])
