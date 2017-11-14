@@ -1,6 +1,14 @@
 from PyQt5 import QtCore,  QtWidgets, QtGui
 
 class MainGrid():
+    """
+    Initializing the MainGrid (page0). This is the page of the devices that are currently added by the user.
+    This page has a gridlayout with widgets of the devices in it.
+    The gridlayout can support up to 9 devices, this is because there is no option to rezise the mainwindow or the ability to scroll.
+    Every device shows the status and the name of the device, where the status will have the ability to change color and text.
+    This is done by remaking the whole page.
+    The ghost frame inside is there to make the gridlayout put the first device start on the top left.
+    """
     def __init__(self, widget, devices):
         stylsheetFile = "MainGrid.css"
         fh = open(stylsheetFile)
